@@ -12,18 +12,33 @@ import { AddExpenseModal } from './components/AddExpenseModal';
 import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS, INITIAL_SAVINGS_GOALS } from './data/mockData';
 import type { Expense, Category, PaymentMethod, Budget, Subscription, SavingGoal, AppSettings } from './types';
 
+// APP VERSION CONFIGURATION FOR PERSISTENT DATA MIGRATION
+export const APP_VERSION = 1;
+const VERSION_KEY = 'et_app_version';
+
 export function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings'>('dashboard');
   const [viewMode, setViewMode] = useState<'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN'>('PHONE_FRAME');
 
+  // Verify and record current version schema
+  useEffect(() => {
+    const savedVersion = localStorage.getItem(VERSION_KEY);
+    if (!savedVersion) {
+      localStorage.setItem(VERSION_KEY, String(APP_VERSION));
+    }
+  }, []);
+
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     const saved = localStorage.getItem('et_expenses');
     if (saved) {
-      const parsed: Expense[] = JSON.parse(saved);
-      if (parsed.some(e => e.amount < 500 && e.title.includes('Salary'))) {
-        return INITIAL_EXPENSES;
+      try {
+        const parsed: Expense[] = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (err) {
+        console.error('Error loading saved expenses:', err);
       }
-      return parsed;
     }
     return INITIAL_EXPENSES;
   });
@@ -37,24 +52,16 @@ export function App() {
     const saved = localStorage.getItem('et_payment_methods');
     if (saved) {
       const parsed: PaymentMethod[] = JSON.parse(saved);
-      if (parsed.some(pm => pm.type === 'CARD' || pm.type === 'BANK')) {
-        return INITIAL_PAYMENT_METHODS;
-      }
-      return parsed;
+      // Clean up legacy card/bank methods if upgrading from older drafts
+      const filtered = parsed.filter(pm => pm.type === 'UPI' || pm.type === 'CASH');
+      if (filtered.length > 0) return filtered;
     }
     return INITIAL_PAYMENT_METHODS;
   });
 
   const [budgets, setBudgets] = useState<Budget[]>(() => {
     const saved = localStorage.getItem('et_budgets');
-    if (saved) {
-      const parsed: Budget[] = JSON.parse(saved);
-      if (parsed.some(b => b.limitAmount < 1000)) {
-        return INITIAL_BUDGETS;
-      }
-      return parsed;
-    }
-    return INITIAL_BUDGETS;
+    return saved ? JSON.parse(saved) : INITIAL_BUDGETS;
   });
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(() => {
@@ -74,6 +81,7 @@ export function App() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  // Persistent storage sync (Preserves data across updates)
   useEffect(() => {
     localStorage.setItem('et_expenses', JSON.stringify(expenses));
   }, [expenses]);
