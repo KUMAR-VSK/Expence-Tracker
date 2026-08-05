@@ -321,7 +321,7 @@ fun TransactionItem(
                             .background(categoryColor.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        val iconVector = getIconVectorByName(expense.category?.iconName ?: "category")
+                        val iconVector = IconHelper.getIconByName(expense.category?.iconName ?: "category")
                         Icon(
                             imageVector = iconVector,
                             contentDescription = expense.category?.name ?: "Others",
@@ -389,12 +389,3 @@ fun TransactionItem(
     )
 }
 
-@Composable
-fun getIconVectorByName(name: String): ImageVector {
-    // Basic mapping helper. In production, mapping key strings to Vector icons
-    // using material icons standard
-    return when (name.lowercase()) {
-        "restaurant", "food", "dining" -> Icons.Default.Edit // Custom map or we can load standard Icons
-        else -> Icons.Default.Edit // We will write a proper helper inside Dialogs/Inputs to display vector mapping beautifully.
-    }
-}
