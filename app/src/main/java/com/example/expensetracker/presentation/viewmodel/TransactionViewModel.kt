@@ -53,7 +53,9 @@ class TransactionViewModel @Inject constructor(
     private val deleteExpensesUseCase: DeleteExpensesUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getPaymentMethodsUseCase: GetPaymentMethodsUseCase
+    private val getPaymentMethodsUseCase: GetPaymentMethodsUseCase,
+    private val addPaymentMethodUseCase: AddPaymentMethodUseCase,
+    private val deletePaymentMethodUseCase: DeletePaymentMethodUseCase
 ) : ViewModel() {
 
     // Form states
@@ -270,5 +272,17 @@ class TransactionViewModel @Inject constructor(
 
     fun resetFilters() {
         _filterState.value = HistoryFilterState()
+    }
+
+    fun addPaymentMethod(paymentMethod: PaymentMethod) {
+        viewModelScope.launch {
+            addPaymentMethodUseCase(paymentMethod)
+        }
+    }
+
+    fun deletePaymentMethod(paymentMethod: PaymentMethod) {
+        viewModelScope.launch {
+            deletePaymentMethodUseCase(paymentMethod)
+        }
     }
 }
