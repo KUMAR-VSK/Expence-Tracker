@@ -20,6 +20,10 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val settings: StateFlow<AppSettings> = getSettingsUseCase()
+        .catch { e ->
+            android.util.Log.e("MainVM", "Error reading settings flow", e)
+            emit(AppSettings())
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

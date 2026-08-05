@@ -49,85 +49,94 @@ class DashboardViewModel @Inject constructor(
                 getExpensesUseCase(),
                 getBudgetsUseCase()
             ) { expenses, budgets ->
-                val now = System.currentTimeMillis()
-                
-                val startOfToday = DateUtils.getStartOfDay(now)
-                val endOfToday = DateUtils.getEndOfDay(now)
-                
-                val startOfWeek = DateUtils.getStartOfWeek(now)
-                val endOfWeek = DateUtils.getEndOfWeek(now)
-                
-                val startOfMonth = DateUtils.getStartOfMonth(now)
-                val endOfMonth = DateUtils.getEndOfMonth(now)
+                try {
+                    val now = System.currentTimeMillis()
+                    
+                    val startOfToday = DateUtils.getStartOfDay(now)
+                    val endOfToday = DateUtils.getEndOfDay(now)
+                    
+                    val startOfWeek = DateUtils.getStartOfWeek(now)
+                    val endOfWeek = DateUtils.getEndOfWeek(now)
+                    
+                    val startOfMonth = DateUtils.getStartOfMonth(now)
+                    val endOfMonth = DateUtils.getEndOfMonth(now)
 
-                // Summaries
-                var totalInc = 0.0
-                var totalExp = 0.0
-                var todaySpend = 0.0
-                var weeklySpend = 0.0
-                var monthlySpend = 0.0
-                var maxExp = 0.0
-                var expCount = 0
+                    // Summaries
+                    var totalInc = 0.0
+                    var totalExp = 0.0
+                    var todaySpend = 0.0
+                    var weeklySpend = 0.0
+                    var monthlySpend = 0.0
+                    var maxExp = 0.0
+                    var expCount = 0
 
-                val uniqueDays = mutableSetOf<Long>()
+                    val uniqueDays = mutableSetOf<Long>()
 
-                expenses.forEach { e ->
-                    if (e.type == TransactionType.INCOME) {
-                        totalInc += e.amount
-                    } else {
-                        totalExp += e.amount
-                        expCount++
-                        if (e.amount > maxExp) {
-                            maxExp = e.amount
+                    expenses.forEach { e ->
+                        if (e.type == TransactionType.INCOME) {
+                            totalInc += e.amount
+                        } else {
+                            totalExp += e.amount
+                            expCount++
+                            if (e.amount > maxExp) {
+                                maxExp = e.amount
+                            }
+                            
+                            // Today, Week, Month spending
+                            if (e.dateLong in startOfToday..endOfToday) {
+                                todaySpend += e.amount
+                            }
+                            if (e.dateLong in startOfWeek..endOfWeek) {
+                                weeklySpend += e.amount
+                            }
+                            if (e.dateLong in startOfMonth..endOfMonth) {
+                                monthlySpend += e.amount
+                            }
+                            
+                            uniqueDays.add(DateUtils.getStartOfDay(e.dateLong))
                         }
-                        
-                        // Today, Week, Month spending
-                        if (e.dateLong in startOfToday..endOfToday) {
-                            todaySpend += e.amount
-                        }
-                        if (e.dateLong in startOfWeek..endOfWeek) {
-                            weeklySpend += e.amount
-                        }
-                        if (e.dateLong in startOfMonth..endOfMonth) {
-                            monthlySpend += e.amount
-                        }
-                        
-                        uniqueDays.add(DateUtils.getStartOfDay(e.dateLong))
                     }
+
+                    val balance = totalInc - totalExp
+
+                    // Get monthly global budget
+                    val activeBudget = budgets.find {
+                        it.period == BudgetPeriod.MONTHLY && it.categoryId == null &&
+                        now in it.startDate..it.endDate
+                    }
+                    
+                    val budgetVal = activeBudget?.amount ?: 0.0
+                    val budgetRemain = if (budgetVal > 0.0) budgetVal - monthlySpend else 0.0
+                    val progress = if (budgetVal > 0.0) (monthlySpend / budgetVal).toFloat() else 0.0f
+
+                    // Daily Average computation
+                    val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+                    val avgDaily = if (currentDay > 0) monthlySpend / currentDay else 0.0
+
+                    DashboardState(
+                        totalBalance = balance,
+                        totalIncome = totalInc,
+                        totalExpense = totalExp,
+                        monthlyBudget = budgetVal,
+                        budgetRemaining = budgetRemain,
+                        budgetProgress = progress,
+                        todaySpending = todaySpend,
+                        weeklySpending = weeklySpend,
+                        monthlySpending = monthlySpend,
+                        avgDailySpending = avgDaily,
+                        highestExpense = maxExp,
+                        transactionCount = expenses.size,
+                        recentTransactions = expenses.take(10)
+                    )
+                } catch (e: Exception) {
+                    android.util.Log.e("DashboardVM", "Error calculating state", e)
+                    DashboardState()
                 }
-
-                val balance = totalInc - totalExp
-
-                // Get monthly global budget
-                val activeBudget = budgets.find {
-                    it.period == BudgetPeriod.MONTHLY && it.categoryId == null &&
-                    now in it.startDate..it.endDate
-                }
-                
-                val budgetVal = activeBudget?.amount ?: 0.0
-                val budgetRemain = if (budgetVal > 0.0) budgetVal - monthlySpend else 0.0
-                val progress = if (budgetVal > 0.0) (monthlySpend / budgetVal).toFloat() else 0.0f
-
-                // Daily Average computation
-                val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-                val avgDaily = if (currentDay > 0) monthlySpend / currentDay else 0.0
-
-                DashboardState(
-                    totalBalance = balance,
-                    totalIncome = totalInc,
-                    totalExpense = totalExp,
-                    monthlyBudget = budgetVal,
-                    budgetRemaining = budgetRemain,
-                    budgetProgress = progress,
-                    todaySpending = todaySpend,
-                    weeklySpending = weeklySpend,
-                    monthlySpending = monthlySpend,
-                    avgDailySpending = avgDaily,
-                    highestExpense = maxExp,
-                    transactionCount = expenses.size,
-                    recentTransactions = expenses.take(10)
-                )
-            }.collect {
+            }
+            .catch { e ->
+                android.util.Log.e("DashboardVM", "Flow collection failed", e)
+            }
+            .collect {
                 _uiState.value = it
             }
         }
