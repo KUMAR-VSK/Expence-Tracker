@@ -116,7 +116,7 @@ fun DecimalAmountInput(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TagsInput(
     tags: List<String>,
@@ -170,7 +170,8 @@ fun TagsInput(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 tags.forEach { tag ->
-                    SuggestionChip(
+                    InputChip(
+                        selected = false,
                         onClick = {},
                         label = { Text(tag) },
                         trailingIcon = {

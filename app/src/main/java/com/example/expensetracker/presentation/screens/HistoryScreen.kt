@@ -35,7 +35,7 @@ import com.example.expensetracker.domain.model.Expense
 import com.example.expensetracker.domain.model.PaymentMethod
 import com.example.expensetracker.domain.model.TransactionType
 import com.example.expensetracker.presentation.components.TransactionItem
-import com.example.expensetracker.presentation.viewmodel.SortOrder
+import com.example.expensetracker.domain.usecase.SortOrder
 import com.example.expensetracker.presentation.viewmodel.TransactionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -198,7 +198,7 @@ fun HistoryScreen(
                                     SortOrder.HIGHEST to "Highest Amount",
                                     SortOrder.LOWEST to "Lowest Amount"
                                 )
-                                sortOptions.forEach { (option, label) ->
+                                items(sortOptions) { (option, label) ->
                                     FilterChip(
                                         selected = filterState.sortBy == option,
                                         onClick = { viewModel.onSortChange(option) },

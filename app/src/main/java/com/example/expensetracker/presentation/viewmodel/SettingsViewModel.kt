@@ -185,4 +185,23 @@ class SettingsViewModel @Inject constructor(
             Result.failure(e)
         }
     }
+
+    fun setupPinLock(pin: String?, isEnabled: Boolean) {
+        viewModelScope.launch {
+            val current = getSettingsUseCase.getDirect()
+            val hash = if (pin != null) {
+                val digest = java.security.MessageDigest.getInstance("SHA-256")
+                val bytes = digest.digest(pin.toByteArray())
+                bytes.joinToString("") { "%02x".format(it) }
+            } else {
+                null
+            }
+            saveSettingsUseCase(
+                current.copy(
+                    isPinLocked = isEnabled,
+                    pinHash = hash
+                )
+            )
+        }
+    }
 }

@@ -64,7 +64,7 @@ fun CategorySelectDialog(
                     items(categories) { cat ->
                         val isSelected = selectedCategory?.id == cat.id
                         val catColor = try {
-                            Color(Color.parseColor(cat.colorHex))
+                            Color(android.graphics.Color.parseColor(cat.colorHex))
                         } catch (e: Exception) {
                             Color.Gray
                         }
@@ -317,7 +317,7 @@ fun ColorSelectDialog(
                 ) {
                     items(presetColors) { colorHex ->
                         val color = try {
-                            Color(Color.parseColor(colorHex))
+                            Color(android.graphics.Color.parseColor(colorHex))
                         } catch (e: Exception) {
                             Color.Gray
                         }

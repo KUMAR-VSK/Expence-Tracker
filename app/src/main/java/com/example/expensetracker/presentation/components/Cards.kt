@@ -310,7 +310,7 @@ fun TransactionItem(
                 ) {
                     // Category Icon Circle
                     val categoryColor = try {
-                        Color(Color.parseColor(expense.category?.colorHex ?: "#9E9E9E"))
+                        Color(android.graphics.Color.parseColor(expense.category?.colorHex ?: "#9E9E9E"))
                     } catch (e: Exception) {
                         Color.Gray
                     }
