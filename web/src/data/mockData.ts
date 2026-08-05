@@ -13,8 +13,8 @@ export const INITIAL_CATEGORIES: Category[] = [
 ];
 
 export const INITIAL_PAYMENT_METHODS: PaymentMethod[] = [
-  { id: 'pm_1', name: 'Google Pay (GPay)', type: 'UPI', icon: 'Smartphone', accountNumber: 'user@gpay' },
-  { id: 'pm_2', name: 'Cash', type: 'CASH', icon: 'Banknote', accountNumber: 'Physical Cash' },
+  { id: 'pm_1', name: 'Google Pay', type: 'UPI', icon: 'Smartphone', accountNumber: 'UPI' },
+  { id: 'pm_2', name: 'Cash', type: 'CASH', icon: 'Banknote', accountNumber: 'Cash' },
 ];
 
 export const INITIAL_EXPENSES: Expense[] = [
@@ -28,7 +28,7 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryIcon: 'Briefcase',
     categoryColor: '#10B981',
     paymentMethodId: 'pm_1',
-    paymentMethodName: 'Google Pay (GPay)',
+    paymentMethodName: 'Google Pay',
     date: new Date(Date.now() - 86400000 * 2).toISOString(),
     notes: 'August Tech Corp Salary'
   },
@@ -42,7 +42,7 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryIcon: 'Utensils',
     categoryColor: '#6366F1',
     paymentMethodId: 'pm_1',
-    paymentMethodName: 'Google Pay (GPay)',
+    paymentMethodName: 'Google Pay',
     date: new Date(Date.now() - 86400000 * 1).toISOString(),
     notes: 'Weekly fresh groceries'
   },
@@ -56,7 +56,7 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryIcon: 'Car',
     categoryColor: '#3B82F6',
     paymentMethodId: 'pm_1',
-    paymentMethodName: 'Google Pay (GPay)',
+    paymentMethodName: 'Google Pay',
     date: new Date(Date.now() - 3600000 * 5).toISOString(),
     notes: 'Office ride'
   },
@@ -70,7 +70,7 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryIcon: 'Zap',
     categoryColor: '#F59E0B',
     paymentMethodId: 'pm_1',
-    paymentMethodName: 'Google Pay (GPay)',
+    paymentMethodName: 'Google Pay',
     date: new Date(Date.now() - 86400000 * 3).toISOString(),
     notes: 'Fiber broadband & electricity',
     isRecurring: true,
@@ -100,7 +100,7 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryIcon: 'Laptop',
     categoryColor: '#6366F1',
     paymentMethodId: 'pm_1',
-    paymentMethodName: 'Google Pay (GPay)',
+    paymentMethodName: 'Google Pay',
     date: new Date(Date.now() - 86400000 * 5).toISOString(),
     notes: 'Client milestone 2'
   }

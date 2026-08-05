@@ -227,7 +227,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                   fontSize: 12
                 }}
               >
-                <option value="UPI">Google Pay (GPay)</option>
+                <option value="UPI">Google Pay</option>
                 <option value="CASH">Cash</option>
               </select>
             </div>

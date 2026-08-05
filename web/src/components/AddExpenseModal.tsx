@@ -234,7 +234,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
               }}
             >
               {paymentMethods.map(pm => (
-                <option key={pm.id} value={pm.id}>{pm.name} ({pm.accountNumber})</option>
+                <option key={pm.id} value={pm.id}>{pm.name}</option>
               ))}
             </select>
           </div>
