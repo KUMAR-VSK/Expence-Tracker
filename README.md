@@ -1,167 +1,114 @@
 # Expense Tracker - Technical Architecture & Specifications (v1.0.0)
 
-A high-performance, offline-first mobile and web financial management platform built using Android Native (Kotlin, Jetpack Compose, Room ORM, Dagger Hilt) and a responsive Web Mini Player (React 18, TypeScript 5, Vite 8).
+A high-performance, offline-first mobile and web financial management platform built using a **Unified Mobile-First Architecture**, Android Native WebView runtime (Kotlin `2.1.0`, Hilt `2.55`, WebChromeClient), and a responsive React web engine (React 18, TypeScript 5, Vite 8).
 
 ---
 
 ## 1. Technical Stack Specifications
 
-### 1.1 Android Native Stack
-- **Language**: Kotlin `1.9.24` (Target Compatibility: JVM 17)
+### 1.1 Android Native & WebView Stack
+- **Language**: Kotlin `2.1.0` (Target Compatibility: JVM 17)
 - **Min SDK**: API Level `24` (Android 7.0)
 - **Target SDK**: API Level `34` (Android 14.0)
 - **Build System**: Gradle `8.14.3` with Kotlin DSL (`build.gradle.kts`)
-- **UI Engine**: Jetpack Compose `1.5.8` with Material 3 Design Tokens
-- **State Management**: Kotlin Coroutines `1.8.0` + `StateFlow` / `SharedFlow`
-- **Database Engine**: Room ORM `2.6.1` over SQLite
-- **Dependency Injection**: Dagger Hilt `2.50` (`@HiltViewModel`, `@AndroidEntryPoint`)
-- **Navigation**: Jetpack Navigation Compose `2.7.7` with Type-Safe Route Arguments
+- **WebView Engine**: Android `WebChromeClient` with Native File Chooser Launcher (`ActivityResultContracts.StartActivityForResult`)
+- **Dependency Injection**: Dagger Hilt `2.55` (`@HiltViewModel`, `@AndroidEntryPoint`)
+- **Database Engine**: Room ORM `2.8.4` over SQLite (`db.execSQL` thread-safe prepopulation)
 
-### 1.2 Web Mini Player Stack
+### 1.2 Web Engine & Design System
 - **Runtime / Framework**: React `18.3.1`
 - **Language**: TypeScript `5.4` (Strict Type Checking Enabled)
-- **Bundler / Tooling**: Vite `8.2.0`
-- **Excel Parsing Engine**: SheetJS (`xlsx`)
-- **Design System**: Vanilla CSS3, CSS Custom Properties, Glassmorphism Backdrop Filters
+- **Bundler / Tooling**: Vite `8.2.0` (Relative Base Path `base: './'`)
+- **Excel & File Parsing Engine**: SheetJS (`xlsx`)
+- **Design System**: Mobile-First Responsive Breakpoint Grid, Glassmorphic CSS3, HSL Curated Colors
 - **Iconography**: Lucide React (`lucide-react`)
-- **Persistence Engine**: Web Storage API (Versioned LocalStorage Engine)
+- **Persistence Engine**: Web Storage API (Safe LocalStorage Purge Engine)
 
 ---
 
 ## 2. Key Platform Features
 
+- **Unified Mobile-First Responsive Architecture**:
+  - 100% UI, feature, and visual hierarchy parity between the Web App (`http://localhost:5173`) and the Android APK (`app-debug.apk`).
+  - Mobile-first breakpoints system supporting `360dp`, `390dp`, `412dp`, `768px`, and `1024px+` viewports.
+
 - **Add Bulk (Excel / Photo OCR / PDF Statements)**:
-  - Dedicated menu item for uploading spreadsheets (`.xlsx`, `.csv`), receipt photos (`.png`, `.jpg`), or PDF invoices (`.pdf`).
-  - Interactive preview table allowing inline editing of Title, Amount, Date, and Payment Method before saving.
+  - Multi-format ingestion for spreadsheets (`.xlsx`, `.csv`), receipt photo scans (`.png`, `.jpg`), and PDF invoices (`.pdf`).
+  - Interactive inline preview table for editing Title, Amount, Date, Category, and Payment Method before ingestion.
+  - Native file chooser launcher integrated in Android `WebChromeClient`.
   - Downloadable pre-formatted sample `.csv` template.
 
-- **Mobile Phone Mini Player**:
-  - Interactive device frame simulator with Dynamic Island notch, real-time status bar clock, and smooth navigation drawer.
+- **Interactive Bottom Navigation & Home Indicator**:
+  - Mobile bottom navigation dock featuring 1-tap navigation to **Home**, **History**, **Add Bulk**, and **Analytics**.
+  - Clickable Home chassis indicator bar for instant home redirection.
 
 - **Native INR (`₹`) Formatting**:
   - Strict Indian Rupee (INR) formatting across transactions, category budgets, subscriptions, and financial goals.
 
 - **Simplified Payment Methods**:
-  - Support for **Google Pay** and **Cash** payments without asking for credit card / account numbers.
-
-- **Back-Dated Transactions**:
-  - Native Transaction Date Picker enabling entry of past or custom dates.
-
-- **Monthly Wise Split & Payment Mode Charts**:
-  - Interactive payment mode toggles (All, Google Pay, Cash) with visual percentage split meters and monthly category breakdown badges.
+  - Default support for **Google Pay** and **Cash** payments without asking for sensitive card details.
 
 - **Complete In-App Data Reset**:
-  - Clean in-app glassmorphism modal to purge all transactions and reset budget metrics to 0.
-
-- **Version 1 Data Preservation Architecture**:
-  - Non-destructive Room ORM database migration policy (`fallbackToDestructiveMigrationOnDowngrade(dropAllTables = false)`).
+  - In-app glassmorphism modal to purge all transactions, clear local storage down to 0, and cleanly refresh state.
 
 ---
 
-## 3. System Architecture & Patterns
-
-The platform strictly implements **Clean Architecture** combined with the **MVVM (Model-View-ViewModel)** architectural pattern.
+## 3. System Architecture & Responsive Breakpoints
 
 ```
 +-------------------------------------------------------------------+
-|                        Presentation Layer                         |
-|   - Jetpack Compose Screens / React Views                         |
-|   - ViewModels (StateFlow / React State)                          |
+|                        Unified UI Layer                           |
+|   - Mobile-First Responsive React Components                      |
+|   - 360dp | 390dp | 412dp | 768px | 1024px Breakpoint System      |
 +-------------------------------------------------------------------+
                                   |
-                                  v
-+-------------------------------------------------------------------+
-|                           Domain Layer                            |
-|   - Business Use Cases (ExpenseUseCases, CategoryUseCases)        |
-|   - Domain Models (Expense, Category, Budget, PaymentMethod)      |
-|   - Repository Interfaces                                         |
-+-------------------------------------------------------------------+
-                                  |
-                                  v
-+-------------------------------------------------------------------+
-|                            Data Layer                             |
-|   - DataRepository / ExpenseRepositoryImpl                        |
-|   - Room DAOs (ExpenseDao, CategoryDao, PaymentMethodDao)         |
-|   - SQLite Database & Versioned LocalStorage                      |
-+-------------------------------------------------------------------+
+            +---------------------+---------------------+
+            |                                           |
+            v                                           v
++-----------------------+                   +-----------------------+
+|  Android Native APK   |                   |    Desktop/Mobile     |
+|   (Android WebView)   |                   |     Web Engine        |
+| - WebChromeClient     |                   | - Vite 8 Bundler      |
+| - Local Assets Engine |                   | - LocalStorage API    |
++-----------------------+                   +-----------------------+
 ```
 
 ---
 
-## 4. Database Schema & Data Models
+## 4. Build, Verification, & Deployment Tasks
 
-### 4.1 Entity Definitions
-
-#### Expense Entity (`expenses`)
-- `id` (Long, PrimaryKey, AutoGenerate)
-- `title` (String, Non-Null)
-- `amount` (Double, Non-Null)
-- `type` (String: `"EXPENSE"` | `"INCOME"`)
-- `categoryId` (Long, ForeignKey -> `categories.id`)
-- `categoryName` (String)
-- `categoryColor` (String)
-- `paymentMethodId` (Long, ForeignKey -> `payment_methods.id`)
-- `paymentMethodName` (String: `"Google Pay"` | `"Cash"`)
-- `timestamp` (Long, Epoch Milliseconds / Custom Date)
-- `notes` (String, Optional)
-- `isRecurring` (Boolean, Default: false)
-
-#### Category Entity (`categories`)
-- `id` (Long, PrimaryKey, AutoGenerate)
-- `name` (String, Unique)
-- `type` (String: `"EXPENSE"` | `"INCOME"`)
-- `iconName` (String)
-- `colorHex` (String)
-
-#### Payment Method Entity (`payment_methods`)
-- `id` (Long, PrimaryKey, AutoGenerate)
-- `name` (String: `"Google Pay"` | `"Cash"`)
-- `type` (String: `"UPI"` | `"CASH"`)
-- `iconName` (String)
-
-#### Budget Entity (`budgets`)
-- `id` (Long, PrimaryKey, AutoGenerate)
-- `categoryId` (Long)
-- `limitAmount` (Double)
-- `spentAmount` (Double)
-- `monthYear` (String: `"YYYY-MM"`)
-
----
-
-## 5. Build, Verification, & Deployment Tasks
-
-### 5.1 Android Build & Test Commands
+### 4.1 Android Build Commands
 
 ```bash
 # Execute Unit Test Suite
 ./gradlew test
 
-# Compile Debug APK
+# Build Clean Android Debug APK
 ./gradlew assembleDebug
-
-# Compile Production Release APK
-./gradlew assembleRelease
 ```
-The generated APK artifact is located at:
+The compiled APK artifact is generated at:
 `app/build/outputs/apk/debug/app-debug.apk`
 
-### 5.2 Web Mini Player Commands
+### 4.2 Web Engine & Asset Bundling Commands
 
 ```bash
 # Navigate to web directory
 cd web
 
-# Install Node modules
+# Install Dependencies
 npm install
 
 # Run Vite Development Server
 npm run dev -- --port 5173 --host
 
-# Type-check and Bundle for Production
+# Build Web Bundle with Relative Asset Paths
 npm run build
+
+# Bundle Web Assets into Android APK Assets
+mkdir -p app/src/main/assets/web && cp -r web/dist/* app/src/main/assets/web/
 ```
 
 ---
 
-## 6. License
+## 5. License
 Distributed under the MIT License.
