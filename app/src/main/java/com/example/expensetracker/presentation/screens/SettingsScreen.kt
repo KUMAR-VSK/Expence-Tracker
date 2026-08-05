@@ -159,52 +159,6 @@ fun SettingsScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column {
-                        // Currency selection row
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(36.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(imageVector = Icons.Default.AttachMoney, contentDescription = "", tint = MaterialTheme.colorScheme.primary)
-                                }
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
-                                    Text("Currency Type", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                                    Text("Local: ${settings.currencyCode} (${settings.currencySymbol})", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-                                }
-                            }
-                            
-                            // Compact currency selection buttons
-                            val currencyMap = listOf("USD" to "$", "EUR" to "€", "INR" to "₹", "GBP" to "£")
-                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                currencyMap.forEach { (code, sym) ->
-                                    val isSelected = settings.currencyCode == code
-                                    Box(
-                                        contentAlignment = Alignment.Center,
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
-                                            .clickable { viewModel.updateCurrency(code, sym) }
-                                    ) {
-                                        Text(text = sym, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface)
-                                    }
-                                }
-                            }
-                        }
-
-                        Divider()
-
                         // Decimal Precision selection row
                         Row(
                             modifier = Modifier

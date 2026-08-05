@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Lock, DollarSign, RefreshCw } from 'lucide-react';
+import { Settings as SettingsIcon, Lock, RefreshCw } from 'lucide-react';
 import type { AppSettings } from '../types';
 
 interface SettingsViewProps {
@@ -19,44 +19,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <SettingsIcon size={20} style={{ color: '#6366F1' }} /> App Settings
       </h3>
 
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.04)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: 18,
-        padding: 16,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <DollarSign size={20} style={{ color: '#6366F1' }} />
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#FFF' }}>Currency Symbol</div>
-            <div style={{ fontSize: 12, color: '#94A3B8' }}>Select active currency formatting</div>
-          </div>
-        </div>
-
-        <select
-          value={settings.currency}
-          onChange={e => onUpdateSettings({ currency: e.target.value })}
-          style={{
-            background: '#0F172A',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: 10,
-            padding: '6px 12px',
-            color: '#FFF',
-            fontWeight: 700,
-            fontSize: 15,
-            outline: 'none'
-          }}
-        >
-          <option value="₹">₹ (INR)</option>
-          <option value="$">$ (USD)</option>
-          <option value="€">€ (EUR)</option>
-          <option value="£">£ (GBP)</option>
-        </select>
-      </div>
-
+      {/* Security PIN Lock Switch */}
       <div style={{
         background: 'rgba(255, 255, 255, 0.04)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -82,6 +45,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         />
       </div>
 
+      {/* Reset Data */}
       <button
         onClick={onResetData}
         className="btn-secondary"
