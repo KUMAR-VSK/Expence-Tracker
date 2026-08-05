@@ -148,6 +148,18 @@ export function App() {
     setPaymentMethods(prev => prev.filter(pm => pm.id !== id));
   };
 
+  const handleAddSubscription = (sub: Omit<Subscription, 'id'>) => {
+    const created: Subscription = {
+      ...sub,
+      id: `sub_${Date.now()}`
+    };
+    setSubscriptions(prev => [...prev, created]);
+  };
+
+  const handleDeleteSubscription = (id: string) => {
+    setSubscriptions(prev => prev.filter(s => s.id !== id));
+  };
+
   const handleToggleSubscription = (id: string) => {
     setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
   };
@@ -210,6 +222,8 @@ export function App() {
             subscriptions={subscriptions}
             currency={settings.currency}
             onToggleSubscription={handleToggleSubscription}
+            onAddSubscription={handleAddSubscription}
+            onDeleteSubscription={handleDeleteSubscription}
           />
         )}
 
