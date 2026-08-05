@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, Target, Settings, Wifi, Battery, Signal, Smartphone, Minimize2 } from 'lucide-react';
+import { Home, List, PieChart, Target, Settings, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award } from 'lucide-react';
 
 interface PhoneFrameProps {
-  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'settings';
-  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'settings') => void;
+  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'subscriptions' | 'savings' | 'settings';
+  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'subscriptions' | 'savings' | 'settings') => void;
   viewMode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN';
   onSwitchViewMode: (mode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN') => void;
   children: React.ReactNode;
@@ -30,13 +30,14 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+      {/* Top Toolbar Mode Switcher */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        background: 'rgba(30, 41, 59, 0.8)',
+        background: 'rgba(15, 23, 42, 0.8)',
         backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
         padding: '6px 12px',
         borderRadius: 99,
         boxShadow: '0 8px 20px rgba(0,0,0,0.3)'
@@ -80,6 +81,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
         </button>
       </div>
 
+      {/* Minimalist Phone Chassis */}
       <div className="phone-chassis">
         <div className="dynamic-island">
           <div className="camera-lens" />
@@ -87,8 +89,9 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
         </div>
 
         <div className="phone-screen">
+          {/* Minimal Status Bar */}
           <div className="phone-status-bar">
-            <span>{timeStr || '17:04'}</span>
+            <span>{timeStr || '17:10'}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Signal size={14} />
               <Wifi size={14} />
@@ -96,6 +99,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
             </div>
           </div>
 
+          {/* Body Content */}
           <div style={{
             flex: 1,
             overflowY: 'auto',
@@ -106,26 +110,29 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
             {children}
           </div>
 
+          {/* Minimalist Bottom Navigation Bar */}
           <div style={{
             position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
             height: 70,
-            background: 'rgba(15, 23, 42, 0.94)',
+            background: 'rgba(15, 23, 42, 0.96)',
             backdropFilter: 'blur(20px)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-around',
-            paddingBottom: 12,
+            paddingBottom: 10,
             zIndex: 90
           }}>
             {[
               { id: 'dashboard', label: 'Home', icon: Home },
               { id: 'history', label: 'History', icon: List },
-              { id: 'analytics', label: 'Analytics', icon: PieChart },
+              { id: 'analytics', label: 'Stats', icon: PieChart },
               { id: 'budget', label: 'Budget', icon: Target },
+              { id: 'subscriptions', label: 'Subs', icon: RefreshCw },
+              { id: 'savings', label: 'Goals', icon: Award },
               { id: 'settings', label: 'Settings', icon: Settings }
             ].map(item => {
               const Icon = item.icon;
@@ -143,12 +150,12 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
                     alignItems: 'center',
                     gap: 3,
                     cursor: 'pointer',
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: 700,
                     transition: 'all 0.2s'
                   }}
                 >
-                  <Icon size={20} style={{ transform: isActive ? 'scale(1.1)' : 'scale(1)' }} />
+                  <Icon size={18} style={{ transform: isActive ? 'scale(1.1)' : 'scale(1)' }} />
                   {item.label}
                 </button>
               );

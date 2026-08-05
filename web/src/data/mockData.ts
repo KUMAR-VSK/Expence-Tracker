@@ -1,7 +1,7 @@
-import type { Category, PaymentMethod, Expense, Budget } from '../types';
+import type { Category, PaymentMethod, Expense, Budget, Subscription, SavingGoal } from '../types';
 
 export const INITIAL_CATEGORIES: Category[] = [
-  { id: 'cat_1', name: 'Food & Dining', icon: 'Utensils', color: '#EF4444', type: 'EXPENSE' },
+  { id: 'cat_1', name: 'Food & Dining', icon: 'Utensils', color: '#6366F1', type: 'EXPENSE' },
   { id: 'cat_2', name: 'Shopping', icon: 'ShoppingBag', color: '#EC4899', type: 'EXPENSE' },
   { id: 'cat_3', name: 'Transport', icon: 'Car', color: '#3B82F6', type: 'EXPENSE' },
   { id: 'cat_4', name: 'Bills & Utilities', icon: 'Zap', color: '#F59E0B', type: 'EXPENSE' },
@@ -23,7 +23,7 @@ export const INITIAL_EXPENSES: Expense[] = [
   {
     id: 'exp_1',
     title: 'Monthly Salary Credit',
-    amount: 4500,
+    amount: 85000,
     type: 'INCOME',
     categoryId: 'cat_7',
     categoryName: 'Salary',
@@ -36,23 +36,22 @@ export const INITIAL_EXPENSES: Expense[] = [
   },
   {
     id: 'exp_2',
-    title: 'Whole Foods Grocery',
-    amount: 142.50,
+    title: 'Supermarket Grocery',
+    amount: 3450,
     type: 'EXPENSE',
     categoryId: 'cat_1',
     categoryName: 'Food & Dining',
     categoryIcon: 'Utensils',
-    categoryColor: '#EF4444',
+    categoryColor: '#6366F1',
     paymentMethodId: 'pm_1',
     paymentMethodName: 'HDFC Credit Card',
     date: new Date(Date.now() - 86400000 * 1).toISOString(),
-    notes: 'Weekly fresh groceries & organic fruit',
-    hasAudioNote: true
+    notes: 'Weekly fresh groceries'
   },
   {
     id: 'exp_3',
-    title: 'Uber Ride to Downtown',
-    amount: 24.80,
+    title: 'Uber Commute',
+    amount: 480,
     type: 'EXPENSE',
     categoryId: 'cat_3',
     categoryName: 'Transport',
@@ -61,12 +60,12 @@ export const INITIAL_EXPENSES: Expense[] = [
     paymentMethodId: 'pm_2',
     paymentMethodName: 'Google Pay UPI',
     date: new Date(Date.now() - 3600000 * 5).toISOString(),
-    notes: 'Ride back from office client meeting'
+    notes: 'Office ride'
   },
   {
     id: 'exp_4',
-    title: 'Electricity & Wi-Fi Bill',
-    amount: 88.00,
+    title: 'Electricity & Internet Bill',
+    amount: 2200,
     type: 'EXPENSE',
     categoryId: 'cat_4',
     categoryName: 'Bills & Utilities',
@@ -75,12 +74,14 @@ export const INITIAL_EXPENSES: Expense[] = [
     paymentMethodId: 'pm_2',
     paymentMethodName: 'Google Pay UPI',
     date: new Date(Date.now() - 86400000 * 3).toISOString(),
-    notes: 'Fiber Optic broadband & power bill'
+    notes: 'Fiber broadband & electricity',
+    isRecurring: true,
+    recurringFrequency: 'MONTHLY'
   },
   {
     id: 'exp_5',
-    title: 'Nike Air Max Sneakers',
-    amount: 129.99,
+    title: 'Apparel Store Shopping',
+    amount: 2899,
     type: 'EXPENSE',
     categoryId: 'cat_2',
     categoryName: 'Shopping',
@@ -89,12 +90,12 @@ export const INITIAL_EXPENSES: Expense[] = [
     paymentMethodId: 'pm_1',
     paymentMethodName: 'HDFC Credit Card',
     date: new Date(Date.now() - 86400000 * 4).toISOString(),
-    notes: 'Summer sale discount purchase'
+    notes: 'Work wear shirts'
   },
   {
     id: 'exp_6',
-    title: 'UI/UX Design Retainer',
-    amount: 850.00,
+    title: 'UI Design Freelance',
+    amount: 18000,
     type: 'INCOME',
     categoryId: 'cat_8',
     categoryName: 'Freelance',
@@ -103,21 +104,7 @@ export const INITIAL_EXPENSES: Expense[] = [
     paymentMethodId: 'pm_4',
     paymentMethodName: 'ICICI Bank',
     date: new Date(Date.now() - 86400000 * 5).toISOString(),
-    notes: 'Client project milestone 2'
-  },
-  {
-    id: 'exp_7',
-    title: 'Cinema Tickets & Popcorn',
-    amount: 32.00,
-    type: 'EXPENSE',
-    categoryId: 'cat_5',
-    categoryName: 'Entertainment',
-    categoryIcon: 'Film',
-    categoryColor: '#8B5CF6',
-    paymentMethodId: 'pm_3',
-    paymentMethodName: 'Cash',
-    date: new Date(Date.now() - 3600000 * 12).toISOString(),
-    notes: 'IMAX Movie night with friends'
+    notes: 'Client milestone 2'
   }
 ];
 
@@ -127,9 +114,9 @@ export const INITIAL_BUDGETS: Budget[] = [
     categoryId: 'cat_1',
     categoryName: 'Food & Dining',
     categoryIcon: 'Utensils',
-    categoryColor: '#EF4444',
-    limitAmount: 500,
-    spentAmount: 142.50,
+    categoryColor: '#6366F1',
+    limitAmount: 15000,
+    spentAmount: 3450,
     monthYear: '2026-08'
   },
   {
@@ -138,8 +125,8 @@ export const INITIAL_BUDGETS: Budget[] = [
     categoryName: 'Shopping',
     categoryIcon: 'ShoppingBag',
     categoryColor: '#EC4899',
-    limitAmount: 300,
-    spentAmount: 129.99,
+    limitAmount: 10000,
+    spentAmount: 2899,
     monthYear: '2026-08'
   },
   {
@@ -148,8 +135,8 @@ export const INITIAL_BUDGETS: Budget[] = [
     categoryName: 'Transport',
     categoryIcon: 'Car',
     categoryColor: '#3B82F6',
-    limitAmount: 200,
-    spentAmount: 24.80,
+    limitAmount: 5000,
+    spentAmount: 480,
     monthYear: '2026-08'
   },
   {
@@ -158,8 +145,21 @@ export const INITIAL_BUDGETS: Budget[] = [
     categoryName: 'Bills & Utilities',
     categoryIcon: 'Zap',
     categoryColor: '#F59E0B',
-    limitAmount: 250,
-    spentAmount: 88.00,
+    limitAmount: 6000,
+    spentAmount: 2200,
     monthYear: '2026-08'
   }
+];
+
+export const INITIAL_SUBSCRIPTIONS: Subscription[] = [
+  { id: 'sub_1', name: 'Netflix 4K Ultra', amount: 649, categoryName: 'Entertainment', billingCycle: 'Monthly', dueDate: '12th', icon: 'Tv', active: true },
+  { id: 'sub_2', name: 'Spotify Premium', amount: 119, categoryName: 'Entertainment', billingCycle: 'Monthly', dueDate: '18th', icon: 'Music', active: true },
+  { id: 'sub_3', name: 'Google One 200GB', amount: 210, categoryName: 'Bills & Utilities', billingCycle: 'Monthly', dueDate: '25th', icon: 'Cloud', active: true },
+  { id: 'sub_4', name: 'Cult.fit Gym Pass', amount: 1499, categoryName: 'Health & Fitness', billingCycle: 'Monthly', dueDate: '1st', icon: 'Activity', active: true }
+];
+
+export const INITIAL_SAVINGS_GOALS: SavingGoal[] = [
+  { id: 'goal_1', title: 'Emergency Fund', targetAmount: 100000, currentAmount: 65000, targetDate: '2026-12', icon: 'Shield', color: '#10B981' },
+  { id: 'goal_2', title: 'MacBook Pro M4', targetAmount: 220000, currentAmount: 140000, targetDate: '2026-11', icon: 'Laptop', color: '#6366F1' },
+  { id: 'goal_3', title: 'Goa Vacation', targetAmount: 35000, currentAmount: 22500, targetDate: '2026-10', icon: 'Sun', color: '#F59E0B' }
 ];

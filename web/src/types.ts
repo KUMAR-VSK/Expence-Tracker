@@ -30,6 +30,8 @@ export interface Expense {
   date: string; // ISO string
   notes?: string;
   hasAudioNote?: boolean;
+  isRecurring?: boolean;
+  recurringFrequency?: 'MONTHLY' | 'WEEKLY' | 'YEARLY';
 }
 
 export interface Budget {
@@ -40,11 +42,32 @@ export interface Budget {
   categoryColor: string;
   limitAmount: number;
   spentAmount: number;
-  monthYear: string; // e.g. "2026-08"
+  monthYear: string;
+}
+
+export interface Subscription {
+  id: string;
+  name: string;
+  amount: number;
+  categoryName: string;
+  billingCycle: 'Monthly' | 'Yearly';
+  dueDate: string;
+  icon: string;
+  active: boolean;
+}
+
+export interface SavingGoal {
+  id: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate: string;
+  icon: string;
+  color: string;
 }
 
 export interface AppSettings {
-  currency: string; // '$', '₹', '€', '£'
+  currency: string; // '₹', '$', '€', '£'
   darkMode: boolean;
   isPinLocked: boolean;
   pin: string;

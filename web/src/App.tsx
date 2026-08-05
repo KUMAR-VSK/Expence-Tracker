@@ -4,14 +4,16 @@ import { DashboardView } from './components/DashboardView';
 import { TransactionsView } from './components/TransactionsView';
 import { AnalyticsView } from './components/AnalyticsView';
 import { BudgetView } from './components/BudgetView';
+import { SubscriptionsView } from './components/SubscriptionsView';
+import { SavingsView } from './components/SavingsView';
 import { SettingsView } from './components/SettingsView';
 import { MiniPlayerBar } from './components/MiniPlayerBar';
 import { AddExpenseModal } from './components/AddExpenseModal';
-import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS } from './data/mockData';
-import type { Expense, Category, PaymentMethod, Budget, AppSettings } from './types';
+import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS, INITIAL_SAVINGS_GOALS } from './data/mockData';
+import type { Expense, Category, PaymentMethod, Budget, Subscription, SavingGoal, AppSettings } from './types';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'subscriptions' | 'savings' | 'settings'>('dashboard');
   const [viewMode, setViewMode] = useState<'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN'>('PHONE_FRAME');
 
   const [expenses, setExpenses] = useState<Expense[]>(() => {
@@ -27,6 +29,13 @@ export function App() {
     return saved ? JSON.parse(saved) : INITIAL_BUDGETS;
   });
 
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>(() => {
+    const saved = localStorage.getItem('et_subs');
+    return saved ? JSON.parse(saved) : INITIAL_SUBSCRIPTIONS;
+  });
+
+  const [savingsGoals] = useState<SavingGoal[]>(INITIAL_SAVINGS_GOALS);
+
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('et_settings');
     return saved ? JSON.parse(saved) : {
@@ -40,7 +49,6 @@ export function App() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  // Sync to local storage
   useEffect(() => {
     localStorage.setItem('et_expenses', JSON.stringify(expenses));
   }, [expenses]);
@@ -50,8 +58,11 @@ export function App() {
   }, [budgets]);
 
   useEffect(() => {
+    localStorage.setItem('et_subs', JSON.stringify(subscriptions));
+  }, [subscriptions]);
+
+  useEffect(() => {
     localStorage.setItem('et_settings', JSON.stringify(settings));
-    document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
   }, [settings]);
 
   const handleAddTransaction = (newTx: Omit<Expense, 'id'>) => {
@@ -76,18 +87,22 @@ export function App() {
     setExpenses(prev => prev.filter(e => e.id !== id));
   };
 
+  const handleToggleSubscription = (id: string) => {
+    setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
+  };
+
   const handleResetData = () => {
     setExpenses(INITIAL_EXPENSES);
     setBudgets(INITIAL_BUDGETS);
-    localStorage.removeItem('et_expenses');
-    localStorage.removeItem('et_budgets');
+    setSubscriptions(INITIAL_SUBSCRIPTIONS);
+    localStorage.clear();
   };
 
   const totalIncome = expenses.filter(e => e.type === 'INCOME').reduce((acc, e) => acc + e.amount, 0);
   const totalExpense = expenses.filter(e => e.type === 'EXPENSE').reduce((acc, e) => acc + e.amount, 0);
 
   return (
-    <div style={{ width: '100vw', minHeight: '100vh', padding: '30px 16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div style={{ width: '100vw', minHeight: '100vh', padding: '20px 16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <PhoneFrame
         activeTab={activeTab}
         onChangeTab={setActiveTab}
@@ -121,6 +136,21 @@ export function App() {
         {activeTab === 'budget' && (
           <BudgetView
             budgets={budgets}
+            currency={settings.currency}
+          />
+        )}
+
+        {activeTab === 'subscriptions' && (
+          <SubscriptionsView
+            subscriptions={subscriptions}
+            currency={settings.currency}
+            onToggleSubscription={handleToggleSubscription}
+          />
+        )}
+
+        {activeTab === 'savings' && (
+          <SavingsView
+            savingsGoals={savingsGoals}
             currency={settings.currency}
           />
         )}
