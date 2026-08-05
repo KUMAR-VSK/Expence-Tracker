@@ -114,6 +114,28 @@ body {
   flex-direction: column;
 }
 
+@media (max-width: 600px) {
+  body {
+    padding: 0 !important;
+    align-items: stretch !important;
+  }
+  .phone-chassis {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  .phone-screen {
+    border-radius: 0 !important;
+  }
+  .dynamic-island {
+    display: none !important;
+  }
+}
+
 .phone-screen {
   width: 100%;
   height: 100%;
