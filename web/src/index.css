@@ -255,22 +255,56 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* Badge */
-.badge-income {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34D399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 4px 10px;
-  border-radius: 99px;
-  font-size: 12px;
-  font-weight: 600;
+/* Responsive Layout & Breakpoints System */
+.app-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.badge-expense {
-  background: rgba(239, 68, 68, 0.15);
-  color: #F87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  padding: 4px 10px;
-  border-radius: 99px;
-  font-size: 12px;
-  font-weight: 600;
+
+/* Responsive Grid Utility */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
+
+.responsive-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* Mobile Breakpoint Tweaks */
+@media (max-width: 380px) {
+  /* 360dp Small Android Screens */
+  .responsive-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .phone-status-bar {
+    padding: 8px 16px 0 16px;
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Tablet 768px Breakpoint */
+  .app-container {
+    max-width: 640px;
+  }
+  .responsive-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop 1024px Breakpoint */
+  .app-container {
+    max-width: 680px;
+  }
+}
+
