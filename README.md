@@ -1,97 +1,153 @@
-# Expense Tracker - Android & Web Mini Player (v1.0.0)
+# Expense Tracker - Technical Architecture & Specifications (v1.0.0)
 
-A sleek, minimalist, offline-first Expense Tracker & Financial Management Application featuring an Android App (Jetpack Compose, Room DB, Hilt) and an interactive Web Mini Player (React, TypeScript, Vite).
-
-Designed with a clean dark mode aesthetic, Indian Rupee (INR) formatting, and zero clutter.
+A high-performance, offline-first mobile and web financial management platform built using Android Native (Kotlin, Jetpack Compose, Room ORM, Dagger Hilt) and a responsive Web Mini Player (React 18, TypeScript 5, Vite 8).
 
 ---
 
-## Features Overview
+## 1. Technical Stack Specifications
 
-- Mobile Phone Mini Player:
-  - Interactive device frame simulator with Dynamic Island notch, real-time status bar clock, and smooth navigation.
-  - Floating Mini-Player Ticker Bar with real-time balance pulse & play/pause audio note playback simulator.
+### 1.1 Android Native Stack
+- **Language**: Kotlin `1.9.24` (Target Compatibility: JVM 17)
+- **Min SDK**: API Level `24` (Android 7.0)
+- **Target SDK**: API Level `34` (Android 14.0)
+- **Build System**: Gradle `8.14.3` with Kotlin DSL (`build.gradle.kts`)
+- **UI Engine**: Jetpack Compose `1.5.8` with Material 3 Design Tokens
+- **State Management**: Kotlin Coroutines `1.8.0` + `StateFlow` / `SharedFlow`
+- **Database Engine**: Room ORM `2.6.1` over SQLite
+- **Dependency Injection**: Dagger Hilt `2.50` (`@HiltViewModel`, `@AndroidEntryPoint`)
+- **Navigation**: Jetpack Navigation Compose `2.7.7` with Type-Safe Route Arguments
+- **Asynchronous Execution**: Dispatchers.IO for I/O operations & Dispatchers.Main for UI mutations
 
-- INR Currency Native:
-  - Strict Indian Rupee (INR) formatting across all transactions, category budgets, subscriptions, and financial goals.
-
-- Simplified Payment Methods:
-  - Native support for Google Pay (GPay) and Cash payments without asking for credit card or account details.
-
-- 3-Bar Side Navigation Drawer:
-  - Clean side drawer menu for navigating between Dashboard, History, Analytics, Budgets, Subscriptions, Savings Goals, and Category Management.
-
-- Recurring Subscriptions Tracker:
-  - Track monthly and yearly subscriptions (Netflix, Spotify, Cloud Storage, Gym Pass) with active/paused toggles.
-
-- Savings Targets & Goals:
-  - Set financial milestones (Emergency Fund, New Gadget, Vacation) with percentage progress bars and remaining targets.
-
-- Category & Payment Management:
-  - Add/remove custom expense & income categories with custom color tags.
-  - Add/remove payment methods dynamically with local storage persistence.
-
-- Version 1 Data Preservation Architecture:
-  - Schema versioning tag (v1.0.0) ensures user data is preserved and never erased when upgrading to future app versions.
+### 1.2 Web Mini Player Stack
+- **Runtime / Framework**: React `18.3.1`
+- **Language**: TypeScript `5.4` (Strict Type Checking Enabled)
+- **Bundler / Tooling**: Vite `8.2.0`
+- **Design System**: Vanilla CSS3, CSS Custom Properties, Glassmorphism Backdrop Filters
+- **Iconography**: Lucide React (`lucide-react`)
+- **Persistence Engine**: Web Storage API (Versioned LocalStorage Engine)
 
 ---
 
-## Technology Stack
+## 2. System Architecture & Patterns
 
-### Android Application
-- Language: Kotlin 1.9.24
-- UI Framework: Jetpack Compose (Material3)
-- Database: Room Database 2.6.1 (SQLite)
-- Dependency Injection: Hilt / Dagger
-- Architecture: MVVM + Clean Architecture
+The platform strictly implements **Clean Architecture** combined with the **MVVM (Model-View-ViewModel)** architectural pattern.
 
-### Web Application / Mini Player
-- Framework: React 18 + Vite 8
-- Language: TypeScript
-- Styling: Modern Vanilla CSS, Glassmorphism, CSS Variables
-- Icons: Lucide React
+```
++-------------------------------------------------------------------+
+|                        Presentation Layer                         |
+|   - Jetpack Compose Screens / React Views                         |
+|   - ViewModels (StateFlow / React State)                          |
++-------------------------------------------------------------------+
+                                  |
+                                  v
++-------------------------------------------------------------------+
+|                           Domain Layer                            |
+|   - Business Use Cases (ExpenseUseCases, CategoryUseCases)        |
+|   - Domain Models (Expense, Category, Budget, PaymentMethod)      |
+|   - Repository Interfaces                                         |
++-------------------------------------------------------------------+
+                                  |
+                                  v
++-------------------------------------------------------------------+
+|                            Data Layer                             |
+|   - DataRepository / ExpenseRepositoryImpl                        |
+|   - Room DAOs (ExpenseDao, CategoryDao, PaymentMethodDao)         |
+|   - SQLite Database & Versioned LocalStorage                      |
++-------------------------------------------------------------------+
+```
 
 ---
 
-## Getting Started
+## 3. Database Schema & Data Models
 
-### 1. Running the Web Mini Player (Mac / Desktop)
+### 3.1 Entity Relationship & Definitions
+
+#### Expense Entity (`expenses`)
+- `id` (Long, PrimaryKey, AutoGenerate)
+- `title` (String, Non-Null)
+- `amount` (Double, Non-Null)
+- `type` (String: `"EXPENSE"` | `"INCOME"`)
+- `categoryId` (Long, ForeignKey -> `categories.id`)
+- `categoryName` (String)
+- `categoryColor` (String)
+- `paymentMethodId` (Long, ForeignKey -> `payment_methods.id`)
+- `paymentMethodName` (String)
+- `timestamp` (Long, Epoch Milliseconds)
+- `notes` (String, Optional)
+- `isRecurring` (Boolean, Default: false)
+
+#### Category Entity (`categories`)
+- `id` (Long, PrimaryKey, AutoGenerate)
+- `name` (String, Unique)
+- `type` (String: `"EXPENSE"` | `"INCOME"`)
+- `iconName` (String)
+- `colorHex` (String)
+
+#### Payment Method Entity (`payment_methods`)
+- `id` (Long, PrimaryKey, AutoGenerate)
+- `name` (String: `"Google Pay (GPay)"` | `"Cash"`)
+- `type` (String: `"UPI"` | `"CASH"`)
+- `iconName` (String)
+
+#### Budget Entity (`budgets`)
+- `id` (Long, PrimaryKey, AutoGenerate)
+- `categoryId` (Long)
+- `limitAmount` (Double)
+- `spentAmount` (Double)
+- `monthYear` (String: `"YYYY-MM"`)
+
+#### Settings Entity (`settings`)
+- `id` (Long, PrimaryKey = 1)
+- `currencyCode` (String = `"INR"`)
+- `currencySymbol` (String = `"₹"`)
+- `decimalPrecision` (Int = 2)
+- `isPinLocked` (Boolean = false)
+- `pinHash` (String, Nullable)
+
+---
+
+## 4. Data Persistence & Migration Policy
+
+1. **Version 1 Schema Lock (`APP_VERSION = 1`)**:
+   - Both Android Room ORM and Web LocalStorage tag state with schema version `1`.
+2. **Zero Data Loss Migration Guarantee**:
+   - Database migrations use explicitly defined `Migration(startVersion, endVersion)` paths to modify SQLite tables without dropping existing records.
+   - Web LocalStorage handles version fallback to preserve user transactions and custom categories during client updates.
+
+---
+
+## 5. Build, Verification, & Deployment Tasks
+
+### 5.1 Android Build & Test Commands
 
 ```bash
-# Navigate to the web folder
+# Execute Unit Test Suite
+./gradlew test
+
+# Compile Debug APK
+./gradlew assembleDebug
+
+# Compile Production Release APK
+./gradlew assembleRelease
+```
+
+### 5.2 Web Mini Player Commands
+
+```bash
+# Navigate to web directory
 cd web
 
-# Install dependencies
+# Install Node modules
 npm install
 
-# Start local dev server
-npm run dev -- --port 5173
+# Run Vite Development Server
+npm run dev -- --port 5173 --host
+
+# Type-check and Bundle for Production
+npm run build
 ```
-Open http://localhost:5173 in your browser.
 
 ---
 
-### 2. Building the Android Debug APK
-
-```bash
-# Clean and assemble debug APK
-./gradlew assembleDebug
-```
-The generated APK file is located at:
-`app/build/outputs/apk/debug/app-debug.apk`
-
----
-
-## Mobile APK Testing via Local Web Server
-
-1. Start the local server serving the built APK:
-   ```bash
-   python3 -m http.server 8080 --directory app/build/outputs/apk/debug
-   ```
-2. Connect your mobile device to the same Wi-Fi network and open:
-   `http://<YOUR_MAC_IP>:8080/app-debug.apk`
-
----
-
-## License
-Licensed under the MIT License.
+## 6. License
+Distributed under the MIT License.
