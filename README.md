@@ -28,7 +28,33 @@ A high-performance, offline-first mobile and web financial management platform b
 
 ---
 
-## 2. System Architecture & Patterns
+## 2. Feature Architecture
+
+- **Mobile Phone Mini Player**:
+  - Interactive device frame simulator with Dynamic Island notch, status bar clock, and smooth navigation.
+  - Floating Mini-Player Ticker Bar with real-time balance pulse & voice note playback simulator.
+
+- **Native INR (`₹`) Formatting**:
+  - Strict Indian Rupee (INR) formatting across transactions, category budgets, subscriptions, and financial goals.
+
+- **Simplified Payment Methods**:
+  - Native support for **Google Pay** and **Cash** without requiring credit card or account details.
+
+- **3-Bar Side Navigation Drawer Menu**:
+  - Clean side drawer menu for navigating between Dashboard, History, Analytics, Budgets, Subscriptions, Savings Goals, and Category Management.
+
+- **Back-Dated Transactions**:
+  - Native Transaction Date Picker enabling entry of past/custom dates for historical record keeping.
+
+- **Payment Mode Split & Category Percentage Charts**:
+  - Interactive payment mode toggles (All, Google Pay, Cash) with visual percentage split meters and category breakdown badges.
+
+- **Version 1 Data Preservation Architecture**:
+  - Room ORM fallback configuration and schema tagging (`v1.0.0`) preserve database data across in-place APK updates and app upgrades.
+
+---
+
+## 3. System Architecture & Patterns
 
 The platform strictly implements **Clean Architecture** combined with the **MVVM (Model-View-ViewModel)** architectural pattern.
 
@@ -58,9 +84,9 @@ The platform strictly implements **Clean Architecture** combined with the **MVVM
 
 ---
 
-## 3. Database Schema & Data Models
+## 4. Database Schema & Data Models
 
-### 3.1 Entity Relationship & Definitions
+### 4.1 Entity Definitions
 
 #### Expense Entity (`expenses`)
 - `id` (Long, PrimaryKey, AutoGenerate)
@@ -71,8 +97,8 @@ The platform strictly implements **Clean Architecture** combined with the **MVVM
 - `categoryName` (String)
 - `categoryColor` (String)
 - `paymentMethodId` (Long, ForeignKey -> `payment_methods.id`)
-- `paymentMethodName` (String)
-- `timestamp` (Long, Epoch Milliseconds)
+- `paymentMethodName` (String: `"Google Pay"` | `"Cash"`)
+- `timestamp` (Long, Epoch Milliseconds / Selected Custom Date)
 - `notes` (String, Optional)
 - `isRecurring` (Boolean, Default: false)
 
@@ -85,7 +111,7 @@ The platform strictly implements **Clean Architecture** combined with the **MVVM
 
 #### Payment Method Entity (`payment_methods`)
 - `id` (Long, PrimaryKey, AutoGenerate)
-- `name` (String: `"Google Pay (GPay)"` | `"Cash"`)
+- `name` (String: `"Google Pay"` | `"Cash"`)
 - `type` (String: `"UPI"` | `"CASH"`)
 - `iconName` (String)
 
@@ -96,29 +122,21 @@ The platform strictly implements **Clean Architecture** combined with the **MVVM
 - `spentAmount` (Double)
 - `monthYear` (String: `"YYYY-MM"`)
 
-#### Settings Entity (`settings`)
-- `id` (Long, PrimaryKey = 1)
-- `currencyCode` (String = `"INR"`)
-- `currencySymbol` (String = `"₹"`)
-- `decimalPrecision` (Int = 2)
-- `isPinLocked` (Boolean = false)
-- `pinHash` (String, Nullable)
-
 ---
 
-## 4. Data Persistence & Migration Policy
+## 5. Data Persistence & Migration Policy
 
 1. **Version 1 Schema Lock (`APP_VERSION = 1`)**:
    - Both Android Room ORM and Web LocalStorage tag state with schema version `1`.
 2. **Zero Data Loss Migration Guarantee**:
-   - Database migrations use explicitly defined `Migration(startVersion, endVersion)` paths to modify SQLite tables without dropping existing records.
-   - Web LocalStorage handles version fallback to preserve user transactions and custom categories during client updates.
+   - Database updates use non-destructive migration policies (`fallbackToDestructiveMigrationOnDowngrade(dropAllTables = false)`).
+   - In-place APK reinstallations preserve the internal SQLite database (`expense_tracker_db`).
 
 ---
 
-## 5. Build, Verification, & Deployment Tasks
+## 6. Build & Test Commands
 
-### 5.1 Android Build & Test Commands
+### 6.1 Android Build Tasks
 
 ```bash
 # Execute Unit Test Suite
@@ -131,7 +149,7 @@ The platform strictly implements **Clean Architecture** combined with the **MVVM
 ./gradlew assembleRelease
 ```
 
-### 5.2 Web Mini Player Commands
+### 6.2 Web Mini Player Commands
 
 ```bash
 # Navigate to web directory
@@ -149,5 +167,5 @@ npm run build
 
 ---
 
-## 6. License
+## 7. License
 Distributed under the MIT License.
