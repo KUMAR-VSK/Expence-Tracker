@@ -110,7 +110,9 @@ class ExpenseRepositoryImpl @Inject constructor(
         dateFormat = dateFormat,
         timeFormat = timeFormat,
         isPinLocked = isPinLocked,
-        pinHash = pinHash
+        pinHash = pinHash,
+        userName = userName,
+        savingGoal = savingGoal
     )
 
     private fun AppSettings.toEntity(): SettingsEntity = SettingsEntity(
@@ -122,7 +124,9 @@ class ExpenseRepositoryImpl @Inject constructor(
         dateFormat = dateFormat,
         timeFormat = timeFormat,
         isPinLocked = isPinLocked,
-        pinHash = pinHash
+        pinHash = pinHash,
+        userName = userName,
+        savingGoal = savingGoal
     )
 
     // --- Expenses Repository Implementations ---

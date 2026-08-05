@@ -8,5 +8,7 @@ data class AppSettings(
     val dateFormat: String = "dd MMM yyyy",
     val timeFormat: String = "hh:mm a",
     val isPinLocked: Boolean = false,
-    val pinHash: String? = null
+    val pinHash: String? = null,
+    val userName: String = "Local User",
+    val savingGoal: Double = 0.0
 )

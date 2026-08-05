@@ -14,5 +14,7 @@ data class SettingsEntity(
     val dateFormat: String = "dd/MM/yyyy",
     val timeFormat: String = "HH:mm",
     val isPinLocked: Boolean = false,
-    val pinHash: String? = null
+    val pinHash: String? = null,
+    val userName: String = "Local User",
+    val savingGoal: Double = 0.0
 )
