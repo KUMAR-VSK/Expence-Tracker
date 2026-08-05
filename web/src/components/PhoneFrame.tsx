@@ -42,11 +42,12 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
     { id: 'savings', label: 'Savings Goals', icon: Award, desc: 'Track financial targets' },
   ] as const;
 
+  const [showResetModal, setShowResetModal] = useState(false);
+
   const handleConfirmReset = () => {
-    if (window.confirm('Are you sure you want to reset all data? This will clear all transactions, categories, and settings.')) {
-      onResetAllData();
-      setIsDrawerOpen(false);
-    }
+    onResetAllData();
+    setShowResetModal(false);
+    setIsDrawerOpen(false);
   };
 
   return (
@@ -240,7 +241,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
                 {/* Reset All Data Button */}
                 <div style={{ paddingTop: 16, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
                   <button
-                    onClick={handleConfirmReset}
+                    onClick={() => setShowResetModal(true)}
                     style={{
                       width: '100%',
                       background: 'rgba(239, 68, 68, 0.12)',
@@ -259,6 +260,75 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
                     }}
                   >
                     <RotateCcw size={16} /> Reset All App Data
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Reset Confirmation Modal */}
+          {showResetModal && (
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 300,
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 20
+            }}>
+              <div className="glass-card animate-fade-in" style={{
+                background: '#1E293B',
+                borderRadius: 16,
+                padding: 20,
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12,
+                border: '1px solid rgba(239, 68, 68, 0.4)'
+              }}>
+                <div style={{ width: 44, height: 44, borderRadius: 99, background: 'rgba(239, 68, 68, 0.2)', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+                  <RotateCcw size={22} />
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#FFF' }}>Reset All App Data?</div>
+                <div style={{ fontSize: 12, color: '#94A3B8' }}>
+                  This will clear all transactions, categories, payment methods, budgets, and subscriptions back to fresh defaults.
+                </div>
+
+                <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                  <button
+                    onClick={() => setShowResetModal(false)}
+                    style={{
+                      flex: 1,
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: 10,
+                      padding: '10px 0',
+                      color: '#FFF',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmReset}
+                    style={{
+                      flex: 1,
+                      background: '#EF4444',
+                      border: 'none',
+                      borderRadius: 10,
+                      padding: '10px 0',
+                      color: '#FFF',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Yes, Reset Data
                   </button>
                 </div>
               </div>

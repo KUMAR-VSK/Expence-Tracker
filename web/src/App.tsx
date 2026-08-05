@@ -196,12 +196,7 @@ export function App() {
   };
 
   const handleResetAllData = () => {
-    localStorage.removeItem('et_expenses');
-    localStorage.removeItem('et_categories');
-    localStorage.removeItem('et_payment_methods');
-    localStorage.removeItem('et_budgets');
-    localStorage.removeItem('et_subs');
-    
+    localStorage.clear();
     setExpenses(INITIAL_EXPENSES);
     setCategories(INITIAL_CATEGORIES);
     setPaymentMethods(INITIAL_PAYMENT_METHODS);
