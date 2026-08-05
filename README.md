@@ -16,41 +16,45 @@ A high-performance, offline-first mobile and web financial management platform b
 - **Database Engine**: Room ORM `2.6.1` over SQLite
 - **Dependency Injection**: Dagger Hilt `2.50` (`@HiltViewModel`, `@AndroidEntryPoint`)
 - **Navigation**: Jetpack Navigation Compose `2.7.7` with Type-Safe Route Arguments
-- **Asynchronous Execution**: Dispatchers.IO for I/O operations & Dispatchers.Main for UI mutations
 
 ### 1.2 Web Mini Player Stack
 - **Runtime / Framework**: React `18.3.1`
 - **Language**: TypeScript `5.4` (Strict Type Checking Enabled)
 - **Bundler / Tooling**: Vite `8.2.0`
+- **Excel Parsing Engine**: SheetJS (`xlsx`)
 - **Design System**: Vanilla CSS3, CSS Custom Properties, Glassmorphism Backdrop Filters
 - **Iconography**: Lucide React (`lucide-react`)
 - **Persistence Engine**: Web Storage API (Versioned LocalStorage Engine)
 
 ---
 
-## 2. Feature Architecture
+## 2. Key Platform Features
+
+- **Add Bulk (Excel / Photo OCR / PDF Statements)**:
+  - Dedicated menu item for uploading spreadsheets (`.xlsx`, `.csv`), receipt photos (`.png`, `.jpg`), or PDF invoices (`.pdf`).
+  - Interactive preview table allowing inline editing of Title, Amount, Date, and Payment Method before saving.
+  - Downloadable pre-formatted sample `.csv` template.
 
 - **Mobile Phone Mini Player**:
-  - Interactive device frame simulator with Dynamic Island notch, status bar clock, and smooth navigation.
-  - Floating Mini-Player Ticker Bar with real-time balance pulse & voice note playback simulator.
+  - Interactive device frame simulator with Dynamic Island notch, real-time status bar clock, and smooth navigation drawer.
 
 - **Native INR (`₹`) Formatting**:
   - Strict Indian Rupee (INR) formatting across transactions, category budgets, subscriptions, and financial goals.
 
 - **Simplified Payment Methods**:
-  - Native support for **Google Pay** and **Cash** without requiring credit card or account details.
-
-- **3-Bar Side Navigation Drawer Menu**:
-  - Clean side drawer menu for navigating between Dashboard, History, Analytics, Budgets, Subscriptions, Savings Goals, and Category Management.
+  - Support for **Google Pay** and **Cash** payments without asking for credit card / account numbers.
 
 - **Back-Dated Transactions**:
-  - Native Transaction Date Picker enabling entry of past/custom dates for historical record keeping.
+  - Native Transaction Date Picker enabling entry of past or custom dates.
 
-- **Payment Mode Split & Category Percentage Charts**:
-  - Interactive payment mode toggles (All, Google Pay, Cash) with visual percentage split meters and category breakdown badges.
+- **Monthly Wise Split & Payment Mode Charts**:
+  - Interactive payment mode toggles (All, Google Pay, Cash) with visual percentage split meters and monthly category breakdown badges.
+
+- **Complete In-App Data Reset**:
+  - Clean in-app glassmorphism modal to purge all transactions and reset budget metrics to 0.
 
 - **Version 1 Data Preservation Architecture**:
-  - Room ORM fallback configuration and schema tagging (`v1.0.0`) preserve database data across in-place APK updates and app upgrades.
+  - Non-destructive Room ORM database migration policy (`fallbackToDestructiveMigrationOnDowngrade(dropAllTables = false)`).
 
 ---
 
@@ -98,7 +102,7 @@ The platform strictly implements **Clean Architecture** combined with the **MVVM
 - `categoryColor` (String)
 - `paymentMethodId` (Long, ForeignKey -> `payment_methods.id`)
 - `paymentMethodName` (String: `"Google Pay"` | `"Cash"`)
-- `timestamp` (Long, Epoch Milliseconds / Selected Custom Date)
+- `timestamp` (Long, Epoch Milliseconds / Custom Date)
 - `notes` (String, Optional)
 - `isRecurring` (Boolean, Default: false)
 
@@ -124,19 +128,9 @@ The platform strictly implements **Clean Architecture** combined with the **MVVM
 
 ---
 
-## 5. Data Persistence & Migration Policy
+## 5. Build, Verification, & Deployment Tasks
 
-1. **Version 1 Schema Lock (`APP_VERSION = 1`)**:
-   - Both Android Room ORM and Web LocalStorage tag state with schema version `1`.
-2. **Zero Data Loss Migration Guarantee**:
-   - Database updates use non-destructive migration policies (`fallbackToDestructiveMigrationOnDowngrade(dropAllTables = false)`).
-   - In-place APK reinstallations preserve the internal SQLite database (`expense_tracker_db`).
-
----
-
-## 6. Build & Test Commands
-
-### 6.1 Android Build Tasks
+### 5.1 Android Build & Test Commands
 
 ```bash
 # Execute Unit Test Suite
@@ -148,8 +142,10 @@ The platform strictly implements **Clean Architecture** combined with the **MVVM
 # Compile Production Release APK
 ./gradlew assembleRelease
 ```
+The generated APK artifact is located at:
+`app/build/outputs/apk/debug/app-debug.apk`
 
-### 6.2 Web Mini Player Commands
+### 5.2 Web Mini Player Commands
 
 ```bash
 # Navigate to web directory
@@ -167,5 +163,5 @@ npm run build
 
 ---
 
-## 7. License
+## 6. License
 Distributed under the MIT License.
