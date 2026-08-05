@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Calendar } from 'lucide-react';
 import type { Category, PaymentMethod, TransactionType } from '../types';
 
 interface AddExpenseModalProps {
@@ -38,16 +38,22 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState(categories[0]?.id || '');
   const [paymentMethodId, setPaymentMethodId] = useState(paymentMethods[0]?.id || '');
+  const [txDate, setTxDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
 
   const filteredCategories = categories.filter(c => c.type === type);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !amount || parseFloat(amount) <= 0) return;
+    if (!title || !amount || parseFloat(amount) <= 0 || !txDate) return;
 
     const selectedCategory = categories.find(c => c.id === categoryId) || categories[0];
     const selectedPM = paymentMethods.find(pm => pm.id === paymentMethodId) || paymentMethods[0];
+
+    // Preserve selected back-date time
+    const selectedDateTime = new Date(txDate);
+    // Use current time offset if selected today, or 12:00 PM for past dates
+    selectedDateTime.setHours(12, 0, 0, 0);
 
     onAddTransaction({
       title,
@@ -59,13 +65,14 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
       categoryColor: selectedCategory.color,
       paymentMethodId: selectedPM.id,
       paymentMethodName: selectedPM.name,
-      date: new Date().toISOString(),
+      date: selectedDateTime.toISOString(),
       notes: notes || undefined
     });
 
     setTitle('');
     setAmount('');
     setNotes('');
+    setTxDate(new Date().toISOString().split('T')[0]);
     onClose();
   };
 
@@ -187,6 +194,29 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
                 padding: '10px 12px',
                 borderRadius: 10,
                 background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#FFF',
+                fontSize: 14,
+                outline: 'none'
+              }}
+            />
+          </div>
+
+          {/* Date Picker Field (Supports Back-Dated Transactions) */}
+          <div>
+            <label style={{ fontSize: 13, color: '#94A3B8', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Calendar size={14} style={{ color: '#6366F1' }} /> Transaction Date (Past / Custom Date)
+            </label>
+            <input
+              type="date"
+              value={txDate}
+              onChange={e => setTxDate(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: 10,
+                background: '#0F172A',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: '#FFF',
                 fontSize: 14,
