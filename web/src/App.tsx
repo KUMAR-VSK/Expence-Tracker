@@ -7,6 +7,7 @@ import { BudgetView } from './components/BudgetView';
 import { CategoriesView } from './components/CategoriesView';
 import { SubscriptionsView } from './components/SubscriptionsView';
 import { SavingsView } from './components/SavingsView';
+import { BulkImportView } from './components/BulkImportView';
 import { MiniPlayerBar } from './components/MiniPlayerBar';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { BulkImportModal } from './components/BulkImportModal';
@@ -17,7 +18,7 @@ export const APP_VERSION = 1;
 const VERSION_KEY = 'et_app_version';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import'>('dashboard');
   const [viewMode, setViewMode] = useState<'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN'>('PHONE_FRAME');
 
   useEffect(() => {
@@ -278,6 +279,18 @@ export function App() {
           <SavingsView
             savingsGoals={savingsGoals}
             currency={settings.currency}
+          />
+        )}
+
+        {activeTab === 'bulk_import' && (
+          <BulkImportView
+            categories={categories}
+            paymentMethods={paymentMethods}
+            currency={settings.currency}
+            onConfirmImport={(rawTransactions) => {
+              handleImportBulk(rawTransactions);
+              setActiveTab('history');
+            }}
           />
         )}
       </PhoneFrame>

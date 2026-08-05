@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, Target, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw } from 'lucide-react';
+import { Home, List, PieChart, Target, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet } from 'lucide-react';
 
 interface PhoneFrameProps {
-  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings';
-  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings') => void;
+  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import';
+  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import') => void;
   viewMode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN';
   onSwitchViewMode: (mode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN') => void;
   onResetAllData: () => void;
@@ -35,6 +35,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: Home, desc: 'Overview & Recent Transactions' },
     { id: 'history', label: 'History & Search', icon: List, desc: 'View and filter all expenses' },
     { id: 'analytics', label: 'Analytics', icon: PieChart, desc: 'Category breakdown & stats' },
+    { id: 'bulk_import', label: 'Add Bulk (Excel / Photo / PDF)', icon: FileSpreadsheet, desc: 'Upload, preview & edit bulk items' },
     { id: 'budget', label: 'Budget Planner', icon: Target, desc: 'Set & monitor monthly limits' },
     { id: 'categories', label: 'Manage Categories & Payments', icon: Tag, desc: 'Add / remove categories & cards' },
     { id: 'subscriptions', label: 'Recurring Subscriptions', icon: RefreshCw, desc: 'Track Netflix, Gym & utility bills' },
