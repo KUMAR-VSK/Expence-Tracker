@@ -194,6 +194,7 @@ export function App() {
   };
 
   const handleResetAllData = () => {
+    localStorage.clear();
     localStorage.setItem('et_expenses', JSON.stringify([]));
     localStorage.setItem('et_categories', JSON.stringify(INITIAL_CATEGORIES));
     localStorage.setItem('et_payment_methods', JSON.stringify(INITIAL_PAYMENT_METHODS));
@@ -206,6 +207,7 @@ export function App() {
     setBudgets(INITIAL_BUDGETS.map(b => ({ ...b, spentAmount: 0 })));
     setSubscriptions([]);
     setActiveTab('dashboard');
+    window.location.reload();
   };
 
   const totalIncome = expenses.filter(e => e.type === 'INCOME').reduce((acc, e) => acc + e.amount, 0);

@@ -339,14 +339,112 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
           <div style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '12px 16px 20px 16px',
+            padding: '12px 16px 8px 16px',
             display: 'flex',
             flexDirection: 'column'
           }}>
             {children}
           </div>
 
-          <div className="home-indicator" />
+          {/* Bottom Navigation Dock */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            padding: '8px 12px',
+            background: 'rgba(15, 23, 42, 0.95)',
+            backdropFilter: 'blur(16px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            zIndex: 40
+          }}>
+            <button
+              onClick={() => onChangeTab('dashboard')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === 'dashboard' ? '#6366F1' : '#64748B',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 10,
+                fontWeight: activeTab === 'dashboard' ? 700 : 500,
+                cursor: 'pointer'
+              }}
+            >
+              <Home size={18} />
+              <span>Home</span>
+            </button>
+
+            <button
+              onClick={() => onChangeTab('history')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === 'history' ? '#6366F1' : '#64748B',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 10,
+                fontWeight: activeTab === 'history' ? 700 : 500,
+                cursor: 'pointer'
+              }}
+            >
+              <List size={18} />
+              <span>History</span>
+            </button>
+
+            <button
+              onClick={() => onChangeTab('bulk_import')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === 'bulk_import' ? '#6366F1' : '#64748B',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 10,
+                fontWeight: activeTab === 'bulk_import' ? 700 : 500,
+                cursor: 'pointer'
+              }}
+            >
+              <FileSpreadsheet size={18} />
+              <span>Add Bulk</span>
+            </button>
+
+            <button
+              onClick={() => onChangeTab('analytics')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === 'analytics' ? '#6366F1' : '#64748B',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 10,
+                fontWeight: activeTab === 'analytics' ? 700 : 500,
+                cursor: 'pointer'
+              }}
+            >
+              <PieChart size={18} />
+              <span>Analytics</span>
+            </button>
+          </div>
+
+          {/* Interactive Home Indicator Bar */}
+          <div
+            onClick={() => onChangeTab('dashboard')}
+            title="Click to go Home (Dashboard)"
+            className="home-indicator"
+            style={{
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              bottom: 4
+            }}
+          />
         </div>
       </div>
     </div>
