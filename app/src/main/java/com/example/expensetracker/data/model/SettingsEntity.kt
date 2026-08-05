@@ -8,8 +8,8 @@ data class SettingsEntity(
     @PrimaryKey
     val id: Long = 1, // Single settings record with constant key
     val isDarkMode: Boolean? = null, // Null means follow system theme
-    val currencyCode: String = "USD",
-    val currencySymbol: String = "$",
+    val currencyCode: String = "INR",
+    val currencySymbol: String = "₹",
     val decimalPrecision: Int = 2,
     val dateFormat: String = "dd/MM/yyyy",
     val timeFormat: String = "HH:mm",

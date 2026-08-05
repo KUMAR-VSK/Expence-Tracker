@@ -30,7 +30,7 @@ export function App() {
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('et_settings');
     return saved ? JSON.parse(saved) : {
-      currency: '$',
+      currency: '₹',
       darkMode: true,
       isPinLocked: false,
       pin: '1234',

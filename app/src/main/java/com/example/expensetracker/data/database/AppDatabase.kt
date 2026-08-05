@@ -111,8 +111,8 @@ abstract class AppDatabase : RoomDatabase() {
                 SettingsEntity(
                     id = 1,
                     isDarkMode = null, // Follow system
-                    currencyCode = "USD",
-                    currencySymbol = "$",
+                    currencyCode = "INR",
+                    currencySymbol = "₹",
                     decimalPrecision = 2,
                     dateFormat = "dd MMM yyyy",
                     timeFormat = "hh:mm a",
