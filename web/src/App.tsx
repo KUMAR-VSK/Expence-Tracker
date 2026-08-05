@@ -18,7 +18,15 @@ export function App() {
 
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     const saved = localStorage.getItem('et_expenses');
-    return saved ? JSON.parse(saved) : INITIAL_EXPENSES;
+    if (saved) {
+      const parsed: Expense[] = JSON.parse(saved);
+      // If old mock data was in USD (e.g. salary < 5000), update to INR mock
+      if (parsed.some(e => e.amount < 500 && e.title.includes('Salary'))) {
+        return INITIAL_EXPENSES;
+      }
+      return parsed;
+    }
+    return INITIAL_EXPENSES;
   });
 
   const [categories] = useState<Category[]>(INITIAL_CATEGORIES);
@@ -26,7 +34,14 @@ export function App() {
 
   const [budgets, setBudgets] = useState<Budget[]>(() => {
     const saved = localStorage.getItem('et_budgets');
-    return saved ? JSON.parse(saved) : INITIAL_BUDGETS;
+    if (saved) {
+      const parsed: Budget[] = JSON.parse(saved);
+      if (parsed.some(b => b.limitAmount < 1000)) {
+        return INITIAL_BUDGETS;
+      }
+      return parsed;
+    }
+    return INITIAL_BUDGETS;
   });
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(() => {
@@ -38,7 +53,14 @@ export function App() {
 
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('et_settings');
-    return saved ? JSON.parse(saved) : {
+    if (saved) {
+      const parsed: AppSettings = JSON.parse(saved);
+      if (parsed.currency === '$' || !parsed.currency) {
+        parsed.currency = '₹';
+      }
+      return parsed;
+    }
+    return {
       currency: '₹',
       darkMode: true,
       isPinLocked: false,

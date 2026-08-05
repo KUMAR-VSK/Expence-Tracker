@@ -50,8 +50,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             outline: 'none'
           }}
         >
-          <option value="$">$ (USD)</option>
           <option value="₹">₹ (INR)</option>
+          <option value="$">$ (USD)</option>
           <option value="€">€ (EUR)</option>
           <option value="£">£ (GBP)</option>
         </select>
