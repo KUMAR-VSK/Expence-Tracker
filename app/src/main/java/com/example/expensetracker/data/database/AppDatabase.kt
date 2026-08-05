@@ -5,19 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.expensetracker.data.dao.BudgetDao
-import com.example.expensetracker.data.dao.CategoryDao
-import com.example.expensetracker.data.dao.ExpenseDao
-import com.example.expensetracker.data.dao.PaymentMethodDao
-import com.example.expensetracker.data.dao.SettingsDao
-import com.example.expensetracker.data.model.BudgetEntity
-import com.example.expensetracker.data.model.CategoryEntity
-import com.example.expensetracker.data.model.ExpenseEntity
-import com.example.expensetracker.data.model.PaymentMethodEntity
-import com.example.expensetracker.data.model.SettingsEntity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.expensetracker.data.dao.*
+import com.example.expensetracker.data.model.*
 
 @Database(
     entities = [
@@ -42,14 +31,14 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context, scope: CoroutineScope): AppDatabase {
+        fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "expense_tracker_db"
                 )
-                    .addCallback(DatabaseCallback(scope))
+                    .addCallback(DatabaseCallback())
                     .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = false)
                     .build()
                 INSTANCE = instance
@@ -58,64 +47,34 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 
-    private class DatabaseCallback(
-        private val scope: CoroutineScope
-    ) : RoomDatabase.Callback() {
+    private class DatabaseCallback : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            INSTANCE?.let { database ->
-                scope.launch(Dispatchers.IO) {
-                    prepopulateDatabase(database)
-                }
-            }
-        }
-
-        private suspend fun prepopulateDatabase(db: AppDatabase) {
-            // Default Categories
-            val defaultCategories = listOf(
-                CategoryEntity(name = "Food", iconName = "restaurant", colorHex = "#FF9800"),
-                CategoryEntity(name = "Travel", iconName = "directions_car", colorHex = "#2196F3"),
-                CategoryEntity(name = "Fuel", iconName = "local_gas_station", colorHex = "#00BCD4"),
-                CategoryEntity(name = "Shopping", iconName = "shopping_bag", colorHex = "#E91E63"),
-                CategoryEntity(name = "Bills", iconName = "receipt_long", colorHex = "#9C27B0"),
-                CategoryEntity(name = "Rent", iconName = "home", colorHex = "#795548"),
-                CategoryEntity(name = "Groceries", iconName = "shopping_cart", colorHex = "#4CAF50"),
-                CategoryEntity(name = "Medical", iconName = "medical_services", colorHex = "#F44336"),
-                CategoryEntity(name = "Insurance", iconName = "shield", colorHex = "#607D8B"),
-                CategoryEntity(name = "Education", iconName = "school", colorHex = "#3F51B5"),
-                CategoryEntity(name = "Entertainment", iconName = "sports_esports", colorHex = "#FFC107"),
-                CategoryEntity(name = "Subscriptions", iconName = "card_membership", colorHex = "#673AB7"),
-                CategoryEntity(name = "Salary", iconName = "payments", colorHex = "#009688"),
-                CategoryEntity(name = "Freelancing", iconName = "work", colorHex = "#8BC34A"),
-                CategoryEntity(name = "Investment", iconName = "trending_up", colorHex = "#00E676"),
-                CategoryEntity(name = "Gift", iconName = "card_giftcard", colorHex = "#FF4081"),
-                CategoryEntity(name = "Charity", iconName = "favorite", colorHex = "#FF5722"),
-                CategoryEntity(name = "EMI", iconName = "account_balance", colorHex = "#E64A19"),
-                CategoryEntity(name = "Others", iconName = "category", colorHex = "#9E9E9E")
-            )
-            db.categoryDao().insertCategories(defaultCategories)
+            
+            // Direct synchronous SQLite prepopulation
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Food', 'restaurant', '#FF9800', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Travel', 'directions_car', '#2196F3', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Fuel', 'local_gas_station', '#00BCD4', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Shopping', 'shopping_bag', '#E91E63', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Bills', 'receipt_long', '#9C27B0', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Rent', 'home', '#795548', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Groceries', 'shopping_cart', '#4CAF50', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Medical', 'medical_services', '#F44336', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Insurance', 'shield', '#607D8B', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Education', 'school', '#3F51B5', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Entertainment', 'sports_esports', '#FFC107', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Subscriptions', 'card_membership', '#673AB7', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Salary', 'payments', '#009688', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Freelancing', 'work', '#8BC34A', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Investment', 'trending_up', '#00E676', 0, 0)")
+            db.execSQL("INSERT INTO categories (name, iconName, colorHex, isCustom, isPinned) VALUES ('Others', 'category', '#9E9E9E', 0, 0)")
 
             // Default Payment Methods
-            val defaultPaymentMethods = listOf(
-                PaymentMethodEntity(name = "Google Pay", iconName = "qr_code"),
-                PaymentMethodEntity(name = "Cash", iconName = "money")
-            )
-            db.paymentMethodDao().insertPaymentMethods(defaultPaymentMethods)
+            db.execSQL("INSERT INTO payment_methods (name, iconName, isCustom) VALUES ('Google Pay', 'qr_code', 0)")
+            db.execSQL("INSERT INTO payment_methods (name, iconName, isCustom) VALUES ('Cash', 'money', 0)")
 
             // Default Settings Record
-            db.settingsDao().insertOrUpdateSettings(
-                SettingsEntity(
-                    id = 1,
-                    isDarkMode = null, // Follow system
-                    currencyCode = "INR",
-                    currencySymbol = "₹",
-                    decimalPrecision = 2,
-                    dateFormat = "dd MMM yyyy",
-                    timeFormat = "hh:mm a",
-                    isPinLocked = false,
-                    pinHash = null
-                )
-            )
+            db.execSQL("INSERT OR REPLACE INTO settings (id, isDarkMode, currencyCode, currencySymbol, decimalPrecision, dateFormat, timeFormat, isPinLocked, pinHash, userName, savingGoal) VALUES (1, NULL, 'INR', '₹', 2, 'dd MMM yyyy', 'hh:mm a', 0, NULL, 'Local User', 0.0)")
         }
     }
 }

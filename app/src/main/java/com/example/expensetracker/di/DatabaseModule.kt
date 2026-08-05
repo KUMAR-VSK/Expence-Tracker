@@ -23,10 +23,9 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(
-        @ApplicationContext context: Context,
-        scope: CoroutineScope
+        @ApplicationContext context: Context
     ): AppDatabase {
-        return AppDatabase.getDatabase(context, scope)
+        return AppDatabase.getDatabase(context)
     }
 
     @Provides
