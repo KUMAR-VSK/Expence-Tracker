@@ -4,6 +4,7 @@ import { DashboardView } from './components/DashboardView';
 import { TransactionsView } from './components/TransactionsView';
 import { AnalyticsView } from './components/AnalyticsView';
 import { BudgetView } from './components/BudgetView';
+import { CategoriesView } from './components/CategoriesView';
 import { SubscriptionsView } from './components/SubscriptionsView';
 import { SavingsView } from './components/SavingsView';
 import { SettingsView } from './components/SettingsView';
@@ -13,14 +14,13 @@ import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_
 import type { Expense, Category, PaymentMethod, Budget, Subscription, SavingGoal, AppSettings } from './types';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'subscriptions' | 'savings' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'settings'>('dashboard');
   const [viewMode, setViewMode] = useState<'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN'>('PHONE_FRAME');
 
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     const saved = localStorage.getItem('et_expenses');
     if (saved) {
       const parsed: Expense[] = JSON.parse(saved);
-      // If old mock data was in USD (e.g. salary < 5000), update to INR mock
       if (parsed.some(e => e.amount < 500 && e.title.includes('Salary'))) {
         return INITIAL_EXPENSES;
       }
@@ -29,8 +29,15 @@ export function App() {
     return INITIAL_EXPENSES;
   });
 
-  const [categories] = useState<Category[]>(INITIAL_CATEGORIES);
-  const [paymentMethods] = useState<PaymentMethod[]>(INITIAL_PAYMENT_METHODS);
+  const [categories, setCategories] = useState<Category[]>(() => {
+    const saved = localStorage.getItem('et_categories');
+    return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+  });
+
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(() => {
+    const saved = localStorage.getItem('et_payment_methods');
+    return saved ? JSON.parse(saved) : INITIAL_PAYMENT_METHODS;
+  });
 
   const [budgets, setBudgets] = useState<Budget[]>(() => {
     const saved = localStorage.getItem('et_budgets');
@@ -76,6 +83,14 @@ export function App() {
   }, [expenses]);
 
   useEffect(() => {
+    localStorage.setItem('et_categories', JSON.stringify(categories));
+  }, [categories]);
+
+  useEffect(() => {
+    localStorage.setItem('et_payment_methods', JSON.stringify(paymentMethods));
+  }, [paymentMethods]);
+
+  useEffect(() => {
     localStorage.setItem('et_budgets', JSON.stringify(budgets));
   }, [budgets]);
 
@@ -109,12 +124,38 @@ export function App() {
     setExpenses(prev => prev.filter(e => e.id !== id));
   };
 
+  const handleAddCategory = (cat: Omit<Category, 'id'>) => {
+    const created: Category = {
+      ...cat,
+      id: `cat_${Date.now()}`
+    };
+    setCategories(prev => [...prev, created]);
+  };
+
+  const handleDeleteCategory = (id: string) => {
+    setCategories(prev => prev.filter(c => c.id !== id));
+  };
+
+  const handleAddPaymentMethod = (pm: Omit<PaymentMethod, 'id'>) => {
+    const created: PaymentMethod = {
+      ...pm,
+      id: `pm_${Date.now()}`
+    };
+    setPaymentMethods(prev => [...prev, created]);
+  };
+
+  const handleDeletePaymentMethod = (id: string) => {
+    setPaymentMethods(prev => prev.filter(pm => pm.id !== id));
+  };
+
   const handleToggleSubscription = (id: string) => {
     setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
   };
 
   const handleResetData = () => {
     setExpenses(INITIAL_EXPENSES);
+    setCategories(INITIAL_CATEGORIES);
+    setPaymentMethods(INITIAL_PAYMENT_METHODS);
     setBudgets(INITIAL_BUDGETS);
     setSubscriptions(INITIAL_SUBSCRIPTIONS);
     localStorage.clear();
@@ -159,6 +200,17 @@ export function App() {
           <BudgetView
             budgets={budgets}
             currency={settings.currency}
+          />
+        )}
+
+        {activeTab === 'categories' && (
+          <CategoriesView
+            categories={categories}
+            paymentMethods={paymentMethods}
+            onAddCategory={handleAddCategory}
+            onDeleteCategory={handleDeleteCategory}
+            onAddPaymentMethod={handleAddPaymentMethod}
+            onDeletePaymentMethod={handleDeletePaymentMethod}
           />
         )}
 

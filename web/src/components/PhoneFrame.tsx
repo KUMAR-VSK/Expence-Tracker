@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, Target, Settings, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award } from 'lucide-react';
+import { Home, List, PieChart, Target, Settings, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award, Tag } from 'lucide-react';
 
 interface PhoneFrameProps {
-  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'subscriptions' | 'savings' | 'settings';
-  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'subscriptions' | 'savings' | 'settings') => void;
+  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'settings';
+  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'settings') => void;
   viewMode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN';
   onSwitchViewMode: (mode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN') => void;
   children: React.ReactNode;
@@ -89,9 +89,8 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
         </div>
 
         <div className="phone-screen">
-          {/* Minimal Status Bar */}
           <div className="phone-status-bar">
-            <span>{timeStr || '17:10'}</span>
+            <span>{timeStr || '17:31'}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Signal size={14} />
               <Wifi size={14} />
@@ -99,7 +98,6 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
             </div>
           </div>
 
-          {/* Body Content */}
           <div style={{
             flex: 1,
             overflowY: 'auto',
@@ -110,7 +108,6 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
             {children}
           </div>
 
-          {/* Minimalist Bottom Navigation Bar */}
           <div style={{
             position: 'absolute',
             bottom: 0,
@@ -131,6 +128,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
               { id: 'history', label: 'History', icon: List },
               { id: 'analytics', label: 'Stats', icon: PieChart },
               { id: 'budget', label: 'Budget', icon: Target },
+              { id: 'categories', label: 'Manage', icon: Tag },
               { id: 'subscriptions', label: 'Subs', icon: RefreshCw },
               { id: 'savings', label: 'Goals', icon: Award },
               { id: 'settings', label: 'Settings', icon: Settings }
@@ -150,12 +148,12 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
                     alignItems: 'center',
                     gap: 3,
                     cursor: 'pointer',
-                    fontSize: 9,
+                    fontSize: 8,
                     fontWeight: 700,
                     transition: 'all 0.2s'
                   }}
                 >
-                  <Icon size={18} style={{ transform: isActive ? 'scale(1.1)' : 'scale(1)' }} />
+                  <Icon size={17} style={{ transform: isActive ? 'scale(1.1)' : 'scale(1)' }} />
                   {item.label}
                 </button>
               );
