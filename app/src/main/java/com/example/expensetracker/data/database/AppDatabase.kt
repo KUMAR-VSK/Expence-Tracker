@@ -50,6 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "expense_tracker_db"
                 )
                     .addCallback(DatabaseCallback(scope))
+                    .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = false)
                     .build()
                 INSTANCE = instance
                 instance
