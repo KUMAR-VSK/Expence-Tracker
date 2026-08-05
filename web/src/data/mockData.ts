@@ -13,10 +13,8 @@ export const INITIAL_CATEGORIES: Category[] = [
 ];
 
 export const INITIAL_PAYMENT_METHODS: PaymentMethod[] = [
-  { id: 'pm_1', name: 'HDFC Credit Card', type: 'CARD', icon: 'CreditCard', accountNumber: '•••• 4821' },
-  { id: 'pm_2', name: 'Google Pay UPI', type: 'UPI', icon: 'Smartphone', accountNumber: 'user@okaxis' },
-  { id: 'pm_3', name: 'Cash', type: 'CASH', icon: 'Banknote', accountNumber: 'Wallet' },
-  { id: 'pm_4', name: 'ICICI Bank', type: 'BANK', icon: 'Building', accountNumber: '•••• 9102' },
+  { id: 'pm_1', name: 'Google Pay (GPay)', type: 'UPI', icon: 'Smartphone', accountNumber: 'user@gpay' },
+  { id: 'pm_2', name: 'Cash', type: 'CASH', icon: 'Banknote', accountNumber: 'Physical Cash' },
 ];
 
 export const INITIAL_EXPENSES: Expense[] = [
@@ -29,8 +27,8 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryName: 'Salary',
     categoryIcon: 'Briefcase',
     categoryColor: '#10B981',
-    paymentMethodId: 'pm_4',
-    paymentMethodName: 'ICICI Bank',
+    paymentMethodId: 'pm_1',
+    paymentMethodName: 'Google Pay (GPay)',
     date: new Date(Date.now() - 86400000 * 2).toISOString(),
     notes: 'August Tech Corp Salary'
   },
@@ -44,7 +42,7 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryIcon: 'Utensils',
     categoryColor: '#6366F1',
     paymentMethodId: 'pm_1',
-    paymentMethodName: 'HDFC Credit Card',
+    paymentMethodName: 'Google Pay (GPay)',
     date: new Date(Date.now() - 86400000 * 1).toISOString(),
     notes: 'Weekly fresh groceries'
   },
@@ -57,8 +55,8 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryName: 'Transport',
     categoryIcon: 'Car',
     categoryColor: '#3B82F6',
-    paymentMethodId: 'pm_2',
-    paymentMethodName: 'Google Pay UPI',
+    paymentMethodId: 'pm_1',
+    paymentMethodName: 'Google Pay (GPay)',
     date: new Date(Date.now() - 3600000 * 5).toISOString(),
     notes: 'Office ride'
   },
@@ -71,8 +69,8 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryName: 'Bills & Utilities',
     categoryIcon: 'Zap',
     categoryColor: '#F59E0B',
-    paymentMethodId: 'pm_2',
-    paymentMethodName: 'Google Pay UPI',
+    paymentMethodId: 'pm_1',
+    paymentMethodName: 'Google Pay (GPay)',
     date: new Date(Date.now() - 86400000 * 3).toISOString(),
     notes: 'Fiber broadband & electricity',
     isRecurring: true,
@@ -87,8 +85,8 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryName: 'Shopping',
     categoryIcon: 'ShoppingBag',
     categoryColor: '#EC4899',
-    paymentMethodId: 'pm_1',
-    paymentMethodName: 'HDFC Credit Card',
+    paymentMethodId: 'pm_2',
+    paymentMethodName: 'Cash',
     date: new Date(Date.now() - 86400000 * 4).toISOString(),
     notes: 'Work wear shirts'
   },
@@ -101,8 +99,8 @@ export const INITIAL_EXPENSES: Expense[] = [
     categoryName: 'Freelance',
     categoryIcon: 'Laptop',
     categoryColor: '#6366F1',
-    paymentMethodId: 'pm_4',
-    paymentMethodName: 'ICICI Bank',
+    paymentMethodId: 'pm_1',
+    paymentMethodName: 'Google Pay (GPay)',
     date: new Date(Date.now() - 86400000 * 5).toISOString(),
     notes: 'Client milestone 2'
   }

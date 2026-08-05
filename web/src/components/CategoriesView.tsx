@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tag, CreditCard, Plus, Trash2, Smartphone, Building, Banknote } from 'lucide-react';
+import { Tag, CreditCard, Plus, Trash2, Smartphone, Banknote } from 'lucide-react';
 import type { Category, PaymentMethod, TransactionType } from '../types';
 
 interface CategoriesViewProps {
@@ -227,28 +227,10 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                   fontSize: 12
                 }}
               >
-                <option value="CARD">Card</option>
-                <option value="UPI">UPI</option>
+                <option value="UPI">Google Pay (GPay)</option>
                 <option value="CASH">Cash</option>
-                <option value="BANK">Bank</option>
               </select>
             </div>
-            <input
-              type="text"
-              placeholder="Account / Card Details (e.g. •••• 1234)"
-              value={pmAcc}
-              onChange={e => setPmAcc(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 10,
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: '#FFF',
-                fontSize: 13,
-                outline: 'none'
-              }}
-            />
             <button type="submit" className="btn-primary" style={{ padding: '8px 12px', fontSize: 13, width: '100%' }}>
               <Plus size={14} /> Add Payment Method
             </button>
@@ -280,11 +262,11 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    {pm.type === 'CARD' ? <CreditCard size={16} /> : pm.type === 'UPI' ? <Smartphone size={16} /> : pm.type === 'BANK' ? <Building size={16} /> : <Banknote size={16} />}
+                    {pm.type === 'CASH' ? <Banknote size={16} /> : <Smartphone size={16} />}
                   </div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#FFF' }}>{pm.name}</div>
-                    <div style={{ fontSize: 10, color: '#94A3B8' }}>{pm.accountNumber} • {pm.type}</div>
+                    <div style={{ fontSize: 10, color: '#94A3B8' }}>{pm.type === 'CASH' ? 'Cash Payment' : 'Digital UPI'}</div>
                   </div>
                 </div>
 

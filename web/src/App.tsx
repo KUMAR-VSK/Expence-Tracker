@@ -35,7 +35,14 @@ export function App() {
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(() => {
     const saved = localStorage.getItem('et_payment_methods');
-    return saved ? JSON.parse(saved) : INITIAL_PAYMENT_METHODS;
+    if (saved) {
+      const parsed: PaymentMethod[] = JSON.parse(saved);
+      if (parsed.some(pm => pm.type === 'CARD' || pm.type === 'BANK')) {
+        return INITIAL_PAYMENT_METHODS;
+      }
+      return parsed;
+    }
+    return INITIAL_PAYMENT_METHODS;
   });
 
   const [budgets, setBudgets] = useState<Budget[]>(() => {

@@ -96,13 +96,8 @@ abstract class AppDatabase : RoomDatabase() {
 
             // Default Payment Methods
             val defaultPaymentMethods = listOf(
-                PaymentMethodEntity(name = "Cash", iconName = "money"),
-                PaymentMethodEntity(name = "UPI", iconName = "qr_code"),
-                PaymentMethodEntity(name = "Debit Card", iconName = "credit_card"),
-                PaymentMethodEntity(name = "Credit Card", iconName = "credit_card"),
-                PaymentMethodEntity(name = "Net Banking", iconName = "account_balance"),
-                PaymentMethodEntity(name = "Wallet", iconName = "account_balance_wallet"),
-                PaymentMethodEntity(name = "Others", iconName = "payment")
+                PaymentMethodEntity(name = "Google Pay (GPay)", iconName = "qr_code"),
+                PaymentMethodEntity(name = "Cash", iconName = "money")
             )
             db.paymentMethodDao().insertPaymentMethods(defaultPaymentMethods)
 
