@@ -102,7 +102,7 @@ class SettingsViewModel @Inject constructor(
             CategoryEntity(name = "EMI", iconName = "account_balance", colorHex = "#E64A19"),
             CategoryEntity(name = "Others", iconName = "category", colorHex = "#9E9E9E")
         )
-        appDatabase.categoryDao().insertCategories(defaultCategories)
+        val categoryIds = appDatabase.categoryDao().insertCategories(defaultCategories)
 
         val defaultPaymentMethods = listOf(
             PaymentMethodEntity(name = "Cash", iconName = "money"),
@@ -113,7 +113,85 @@ class SettingsViewModel @Inject constructor(
             PaymentMethodEntity(name = "Wallet", iconName = "account_balance_wallet"),
             PaymentMethodEntity(name = "Others", iconName = "payment")
         )
-        appDatabase.paymentMethodDao().insertPaymentMethods(defaultPaymentMethods)
+        val paymentMethodIds = appDatabase.paymentMethodDao().insertPaymentMethods(defaultPaymentMethods)
+
+        // Generate mock expenses for showcase
+        val now = System.currentTimeMillis()
+        val dayMs = 24 * 60 * 60 * 1000L
+        
+        val foodIdx = defaultCategories.indexOfFirst { it.name == "Food" }
+        val salaryIdx = defaultCategories.indexOfFirst { it.name == "Salary" }
+        val fuelIdx = defaultCategories.indexOfFirst { it.name == "Fuel" }
+        val billsIdx = defaultCategories.indexOfFirst { it.name == "Bills" }
+        val rentIdx = defaultCategories.indexOfFirst { it.name == "Rent" }
+
+        val cashIdx = defaultPaymentMethods.indexOfFirst { it.name == "Cash" }
+        val upiIdx = defaultPaymentMethods.indexOfFirst { it.name == "UPI" }
+        val ccIdx = defaultPaymentMethods.indexOfFirst { it.name == "Credit Card" }
+
+        val foodCatId = if (foodIdx != -1) categoryIds[foodIdx] else 1L
+        val salaryCatId = if (salaryIdx != -1) categoryIds[salaryIdx] else 1L
+        val fuelCatId = if (fuelIdx != -1) categoryIds[fuelIdx] else 1L
+        val billsCatId = if (billsIdx != -1) categoryIds[billsIdx] else 1L
+        val rentCatId = if (rentIdx != -1) categoryIds[rentIdx] else 1L
+
+        val cashPmId = if (cashIdx != -1) paymentMethodIds[cashIdx] else 1L
+        val upiPmId = if (upiIdx != -1) paymentMethodIds[upiIdx] else 1L
+        val ccPmId = if (ccIdx != -1) paymentMethodIds[ccIdx] else 1L
+
+        val sampleExpenses = listOf(
+            ExpenseEntity(
+                amount = 4500.00,
+                type = "INCOME",
+                categoryId = salaryCatId,
+                dateLong = now - 5 * dayMs,
+                timeString = "10:00 AM",
+                paymentMethodId = upiPmId,
+                notes = "Monthly Salary Credit",
+                tags = "salary,primary,active"
+            ),
+            ExpenseEntity(
+                amount = 1200.00,
+                type = "EXPENSE",
+                categoryId = rentCatId,
+                dateLong = now - 4 * dayMs,
+                timeString = "01:00 PM",
+                paymentMethodId = upiPmId,
+                notes = "Apartment Rental bills",
+                tags = "rent,house"
+            ),
+            ExpenseEntity(
+                amount = 45.50,
+                type = "EXPENSE",
+                categoryId = foodCatId,
+                dateLong = now - 2 * dayMs,
+                timeString = "07:30 PM",
+                paymentMethodId = ccPmId,
+                notes = "Dinner at restaurant",
+                tags = "food,dinner,burger"
+            ),
+            ExpenseEntity(
+                amount = 35.00,
+                type = "EXPENSE",
+                categoryId = fuelCatId,
+                dateLong = now - 1 * dayMs,
+                timeString = "08:15 AM",
+                paymentMethodId = cashPmId,
+                notes = "Gas refill station",
+                tags = "gas,fuel,commute"
+            ),
+            ExpenseEntity(
+                amount = 89.90,
+                type = "EXPENSE",
+                categoryId = billsCatId,
+                dateLong = now,
+                timeString = "03:45 PM",
+                paymentMethodId = ccPmId,
+                notes = "Electricity Utilities",
+                tags = "utilities,bills,house"
+            )
+        )
+        appDatabase.expenseDao().insertExpenses(sampleExpenses)
     }
 
     // --- Backup & Restore ---
