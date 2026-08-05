@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, Target, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award, Tag, Menu, X, Shield } from 'lucide-react';
+import { Home, List, PieChart, Target, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw } from 'lucide-react';
 
 interface PhoneFrameProps {
   activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings';
   onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings') => void;
   viewMode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN';
   onSwitchViewMode: (mode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN') => void;
+  onResetAllData: () => void;
   children: React.ReactNode;
 }
 
@@ -14,6 +15,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
   onChangeTab,
   viewMode,
   onSwitchViewMode,
+  onResetAllData,
   children
 }) => {
   const [timeStr, setTimeStr] = useState('');
@@ -38,6 +40,13 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
     { id: 'subscriptions', label: 'Recurring Subscriptions', icon: RefreshCw, desc: 'Track Netflix, Gym & utility bills' },
     { id: 'savings', label: 'Savings Goals', icon: Award, desc: 'Track financial targets' },
   ] as const;
+
+  const handleConfirmReset = () => {
+    if (window.confirm('Are you sure you want to reset all data? This will clear all transactions, categories, and settings.')) {
+      onResetAllData();
+      setIsDrawerOpen(false);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
@@ -176,7 +185,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
                 zIndex: 210
               }}>
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 32, height: 32, borderRadius: 10, background: '#6366F1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
                       <Shield size={18} />
@@ -225,6 +234,31 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
                       </button>
                     );
                   })}
+                </div>
+
+                {/* Reset All Data Button */}
+                <div style={{ paddingTop: 16, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <button
+                    onClick={handleConfirmReset}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(239, 68, 68, 0.12)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      borderRadius: 12,
+                      padding: '10px 12px',
+                      color: '#EF4444',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <RotateCcw size={16} /> Reset All App Data
+                  </button>
                 </div>
               </div>
             </div>

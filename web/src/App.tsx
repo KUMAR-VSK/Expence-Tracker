@@ -164,6 +164,21 @@ export function App() {
     setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
   };
 
+  const handleResetAllData = () => {
+    localStorage.removeItem('et_expenses');
+    localStorage.removeItem('et_categories');
+    localStorage.removeItem('et_payment_methods');
+    localStorage.removeItem('et_budgets');
+    localStorage.removeItem('et_subs');
+    
+    setExpenses(INITIAL_EXPENSES);
+    setCategories(INITIAL_CATEGORIES);
+    setPaymentMethods(INITIAL_PAYMENT_METHODS);
+    setBudgets(INITIAL_BUDGETS);
+    setSubscriptions(INITIAL_SUBSCRIPTIONS);
+    setActiveTab('dashboard');
+  };
+
   const totalIncome = expenses.filter(e => e.type === 'INCOME').reduce((acc, e) => acc + e.amount, 0);
   const totalExpense = expenses.filter(e => e.type === 'EXPENSE').reduce((acc, e) => acc + e.amount, 0);
 
@@ -174,6 +189,7 @@ export function App() {
         onChangeTab={setActiveTab}
         viewMode={viewMode}
         onSwitchViewMode={setViewMode}
+        onResetAllData={handleResetAllData}
       >
         {activeTab === 'dashboard' && (
           <DashboardView
