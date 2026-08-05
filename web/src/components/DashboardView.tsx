@@ -34,10 +34,37 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const totalExpense = expenses.filter(e => e.type === 'EXPENSE').reduce((acc, e) => acc + e.amount, 0);
   const totalBalance = totalIncome - totalExpense;
 
+  const now = new Date();
+  const todayStr = now.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long' });
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+  const todaySpending = expenses
+    .filter(e => e.type === 'EXPENSE' && new Date(e.date).getTime() >= todayStart)
+    .reduce((acc, e) => acc + e.amount, 0);
+
+  const highestExpense = expenses
+    .filter(e => e.type === 'EXPENSE')
+    .reduce((max, e) => e.amount > max ? e.amount : max, 0);
+
+  const currentDay = now.getDate();
+  const avgDaily = currentDay > 0 ? totalExpense / currentDay : 0;
+
   const recentExpenses = expenses.slice(0, 5);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Native APK Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>
+            Hello, Local User 👋
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+            {todayStr}
+          </div>
+        </div>
+      </div>
+
       {/* Total Balance Card */}
       <div style={{
         background: 'linear-gradient(135deg, #4338CA 0%, #6366F1 50%, #8B5CF6 100%)',
@@ -76,6 +103,37 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div style={{ fontSize: 11, opacity: 0.8 }}>Expenses</div>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#F87171' }}>-{currency}{totalExpense.toFixed(0)}</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2x2 Stat Cards Grid (Matching Native APK) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Daily Average</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>
+            {currency}{avgDaily.toFixed(2)}
+          </div>
+        </div>
+
+        <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#EF4444', textTransform: 'uppercase' }}>Highest Expense</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#EF4444', marginTop: 4 }}>
+            {currency}{highestExpense.toFixed(2)}
+          </div>
+        </div>
+
+        <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase' }}>Today's Spending</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#6366F1', marginTop: 4 }}>
+            {currency}{todaySpending.toFixed(2)}
+          </div>
+        </div>
+
+        <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#10B981', textTransform: 'uppercase' }}>Count</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#10B981', marginTop: 4 }}>
+            {expenses.length}
           </div>
         </div>
       </div>
