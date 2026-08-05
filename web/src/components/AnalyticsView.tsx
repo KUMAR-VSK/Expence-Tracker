@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PieChart, Banknote, Smartphone, BarChart2 } from 'lucide-react';
+import { PieChart, Banknote, Smartphone, BarChart2, Calendar } from 'lucide-react';
 import type { Expense } from '../types';
 
 interface AnalyticsViewProps {
@@ -9,18 +9,43 @@ interface AnalyticsViewProps {
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ expenses, currency }) => {
   const [paymentFilter, setPaymentFilter] = useState<'ALL' | 'Cash' | 'Google Pay'>('ALL');
+  const [selectedMonth, setSelectedMonth] = useState<string>('ALL');
 
-  // Filter expenses by payment method
-  const expenseItems = expenses.filter(e => {
-    if (e.type !== 'EXPENSE') return false;
-    if (paymentFilter === 'ALL') return true;
-    return e.paymentMethodName.toLowerCase().includes(paymentFilter.toLowerCase());
+  // Compute month-wise grouped data
+  const monthlyGroups: Record<string, { income: number; expense: number; count: number }> = {};
+
+  expenses.forEach(item => {
+    const d = new Date(item.date);
+    const monthKey = `${d.toLocaleString('default', { month: 'short' })} ${d.getFullYear()}`;
+    if (!monthlyGroups[monthKey]) {
+      monthlyGroups[monthKey] = { income: 0, expense: 0, count: 0 };
+    }
+    monthlyGroups[monthKey].count += 1;
+    if (item.type === 'INCOME') {
+      monthlyGroups[monthKey].income += item.amount;
+    } else {
+      monthlyGroups[monthKey].expense += item.amount;
+    }
   });
 
+  const availableMonths = Object.keys(monthlyGroups);
+
+  // Filter expenses by payment method & month
+  const filteredExpenses = expenses.filter(e => {
+    const d = new Date(e.date);
+    const monthKey = `${d.toLocaleString('default', { month: 'short' })} ${d.getFullYear()}`;
+    
+    const matchesMonth = selectedMonth === 'ALL' || monthKey === selectedMonth;
+    const matchesPayment = paymentFilter === 'ALL' || e.paymentMethodName.toLowerCase().includes(paymentFilter.toLowerCase());
+    
+    return matchesMonth && matchesPayment;
+  });
+
+  const expenseItems = filteredExpenses.filter(e => e.type === 'EXPENSE');
   const totalExpense = expenseItems.reduce((acc, e) => acc + e.amount, 0);
 
   // Overall payment method totals for comparison chart
-  const allExpenseItems = expenses.filter(e => e.type === 'EXPENSE');
+  const allExpenseItems = filteredExpenses.filter(e => e.type === 'EXPENSE');
   const overallTotal = allExpenseItems.reduce((acc, e) => acc + e.amount, 0);
 
   const paymentTotals: Record<string, number> = {
@@ -53,6 +78,77 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ expenses, currency
       <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <PieChart size={20} style={{ color: '#6366F1' }} /> Expense Analytics & Charts
       </h3>
+
+      {/* Month Selector Dropdown */}
+      <div className="glass-card" style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#FFF', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Calendar size={15} style={{ color: '#6366F1' }} /> Month Filter:
+        </div>
+        <select
+          value={selectedMonth}
+          onChange={e => setSelectedMonth(e.target.value)}
+          style={{
+            background: '#0F172A',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 10,
+            padding: '6px 12px',
+            color: '#FFF',
+            fontSize: 13,
+            fontWeight: 600,
+            outline: 'none'
+          }}
+        >
+          <option value="ALL">All Months</option>
+          {availableMonths.map(m => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Monthly-Wise Split Cards Summary */}
+      <div className="glass-card" style={{ padding: 16 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#FFF', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <BarChart2 size={16} style={{ color: '#F59E0B' }} /> Monthly Expense Split
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {availableMonths.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 10, color: '#64748B', fontSize: 12 }}>
+              No monthly data available.
+            </div>
+          ) : (
+            availableMonths.map(month => {
+              const data = monthlyGroups[month];
+              const maxExp = Math.max(...Object.values(monthlyGroups).map(g => g.expense), 1);
+              const barWidth = Math.min((data.expense / maxExp) * 100, 100);
+
+              return (
+                <div
+                  key={month}
+                  onClick={() => setSelectedMonth(month === selectedMonth ? 'ALL' : month)}
+                  style={{
+                    background: selectedMonth === month ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                    border: selectedMonth === month ? '1px solid #6366F1' : '1px solid rgba(255, 255, 255, 0.06)',
+                    borderRadius: 12,
+                    padding: 10,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                    <span style={{ color: '#FFF' }}>{month}</span>
+                    <span style={{ color: '#EF4444' }}>{currency}{data.expense.toFixed(0)}</span>
+                  </div>
+
+                  <div style={{ height: 6, background: 'rgba(255, 255, 255, 0.08)', borderRadius: 99, overflow: 'hidden' }}>
+                    <div style={{ width: `${barWidth}%`, height: '100%', background: '#EF4444', borderRadius: 99 }} />
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
 
       {/* Payment Method Filter Toggle */}
       <div style={{
@@ -166,7 +262,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ expenses, currency
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
-            <div style={{ fontSize: 12, color: '#94A3B8' }}>Filter: {paymentFilter}</div>
+            <div style={{ fontSize: 12, color: '#94A3B8' }}>{selectedMonth === 'ALL' ? 'Total Expenses' : selectedMonth}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: '#F8FAFC' }}>
               {currency}{totalExpense.toFixed(2)}
             </div>
@@ -179,7 +275,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ expenses, currency
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {categoryList.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 20, color: '#64748B', fontSize: 13 }}>
-              No expenses for selected payment filter.
+              No expenses for selected filters.
             </div>
           ) : (
             categoryList.map(cat => {

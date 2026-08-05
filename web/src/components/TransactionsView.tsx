@@ -29,36 +29,72 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'ALL' | 'EXPENSE' | 'INCOME'>('ALL');
+  const [selectedMonth, setSelectedMonth] = useState<string>('ALL');
+
+  // Compute available unique months from expenses
+  const availableMonths = Array.from(new Set(expenses.map(e => {
+    const d = new Date(e.date);
+    return `${d.toLocaleString('default', { month: 'short' })} ${d.getFullYear()}`;
+  })));
 
   const filtered = expenses.filter(e => {
+    const d = new Date(e.date);
+    const monthKey = `${d.toLocaleString('default', { month: 'short' })} ${d.getFullYear()}`;
+    
     const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           e.categoryName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType === 'ALL' || e.type === filterType;
-    return matchesSearch && matchesType;
+    const matchesMonth = selectedMonth === 'ALL' || monthKey === selectedMonth;
+
+    return matchesSearch && matchesType && matchesMonth;
   });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ position: 'relative' }}>
-        <Search size={18} style={{ position: 'absolute', left: 14, top: 12, color: '#64748B' }} />
-        <input
-          type="text"
-          placeholder="Search expenses or categories..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ position: 'relative', flex: 1 }}>
+          <Search size={18} style={{ position: 'absolute', left: 14, top: 12, color: '#64748B' }} />
+          <input
+            type="text"
+            placeholder="Search transactions..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px 14px 10px 42px',
+              borderRadius: 14,
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: '#FFF',
+              fontSize: 14,
+              outline: 'none'
+            }}
+          />
+        </div>
+
+        {/* Month Selector Filter */}
+        <select
+          value={selectedMonth}
+          onChange={e => setSelectedMonth(e.target.value)}
           style={{
-            width: '100%',
-            padding: '10px 14px 10px 42px',
-            borderRadius: 14,
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: '#0F172A',
             border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 14,
+            padding: '0 10px',
             color: '#FFF',
-            fontSize: 14,
+            fontSize: 12,
+            fontWeight: 600,
             outline: 'none'
           }}
-        />
+        >
+          <option value="ALL">All Months</option>
+          {availableMonths.map(m => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
       </div>
 
+      {/* Type Filter Buttons */}
       <div style={{ display: 'flex', gap: 8 }}>
         {(['ALL', 'EXPENSE', 'INCOME'] as const).map(type => (
           <button
@@ -82,10 +118,11 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
         ))}
       </div>
 
+      {/* Transaction Item List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 30, color: '#64748B', fontSize: 14 }}>
-            No transactions found.
+            No transactions found for selected filters.
           </div>
         ) : (
           filtered.map(exp => (
@@ -141,7 +178,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                     {exp.type === 'INCOME' ? '+' : '-'}{currency}{exp.amount.toFixed(2)}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    {new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
                 </div>
 
