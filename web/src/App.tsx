@@ -7,14 +7,13 @@ import { BudgetView } from './components/BudgetView';
 import { CategoriesView } from './components/CategoriesView';
 import { SubscriptionsView } from './components/SubscriptionsView';
 import { SavingsView } from './components/SavingsView';
-import { SettingsView } from './components/SettingsView';
 import { MiniPlayerBar } from './components/MiniPlayerBar';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS, INITIAL_SAVINGS_GOALS } from './data/mockData';
 import type { Expense, Category, PaymentMethod, Budget, Subscription, SavingGoal, AppSettings } from './types';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings'>('dashboard');
   const [viewMode, setViewMode] = useState<'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN'>('PHONE_FRAME');
 
   const [expenses, setExpenses] = useState<Expense[]>(() => {
@@ -58,22 +57,12 @@ export function App() {
 
   const [savingsGoals] = useState<SavingGoal[]>(INITIAL_SAVINGS_GOALS);
 
-  const [settings, setSettings] = useState<AppSettings>(() => {
-    const saved = localStorage.getItem('et_settings');
-    if (saved) {
-      const parsed: AppSettings = JSON.parse(saved);
-      if (parsed.currency === '$' || !parsed.currency) {
-        parsed.currency = '₹';
-      }
-      return parsed;
-    }
-    return {
-      currency: '₹',
-      darkMode: true,
-      isPinLocked: false,
-      pin: '1234',
-      viewMode: 'PHONE_FRAME'
-    };
+  const [settings] = useState<AppSettings>({
+    currency: '₹',
+    darkMode: true,
+    isPinLocked: false,
+    pin: '1234',
+    viewMode: 'PHONE_FRAME'
   });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -97,10 +86,6 @@ export function App() {
   useEffect(() => {
     localStorage.setItem('et_subs', JSON.stringify(subscriptions));
   }, [subscriptions]);
-
-  useEffect(() => {
-    localStorage.setItem('et_settings', JSON.stringify(settings));
-  }, [settings]);
 
   const handleAddTransaction = (newTx: Omit<Expense, 'id'>) => {
     const created: Expense = {
@@ -150,15 +135,6 @@ export function App() {
 
   const handleToggleSubscription = (id: string) => {
     setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
-  };
-
-  const handleResetData = () => {
-    setExpenses(INITIAL_EXPENSES);
-    setCategories(INITIAL_CATEGORIES);
-    setPaymentMethods(INITIAL_PAYMENT_METHODS);
-    setBudgets(INITIAL_BUDGETS);
-    setSubscriptions(INITIAL_SUBSCRIPTIONS);
-    localStorage.clear();
   };
 
   const totalIncome = expenses.filter(e => e.type === 'INCOME').reduce((acc, e) => acc + e.amount, 0);
@@ -226,14 +202,6 @@ export function App() {
           <SavingsView
             savingsGoals={savingsGoals}
             currency={settings.currency}
-          />
-        )}
-
-        {activeTab === 'settings' && (
-          <SettingsView
-            settings={settings}
-            onUpdateSettings={newSet => setSettings(prev => ({ ...prev, ...newSet }))}
-            onResetData={handleResetData}
           />
         )}
       </PhoneFrame>

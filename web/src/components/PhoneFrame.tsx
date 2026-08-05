@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, Target, Settings, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award, Tag } from 'lucide-react';
+import { Home, List, PieChart, Target, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award, Tag, Menu, X, Shield } from 'lucide-react';
 
 interface PhoneFrameProps {
-  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'settings';
-  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'settings') => void;
+  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings';
+  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings') => void;
   viewMode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN';
   onSwitchViewMode: (mode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN') => void;
   children: React.ReactNode;
@@ -17,6 +17,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
   children
 }) => {
   const [timeStr, setTimeStr] = useState('');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     const updateTime = () => {
@@ -28,9 +29,19 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Home, desc: 'Overview & Recent Transactions' },
+    { id: 'history', label: 'History & Search', icon: List, desc: 'View and filter all expenses' },
+    { id: 'analytics', label: 'Analytics', icon: PieChart, desc: 'Category breakdown & stats' },
+    { id: 'budget', label: 'Budget Planner', icon: Target, desc: 'Set & monitor monthly limits' },
+    { id: 'categories', label: 'Manage Categories & Payments', icon: Tag, desc: 'Add / remove categories & cards' },
+    { id: 'subscriptions', label: 'Recurring Subscriptions', icon: RefreshCw, desc: 'Track Netflix, Gym & utility bills' },
+    { id: 'savings', label: 'Savings Goals', icon: Award, desc: 'Track financial targets' },
+  ] as const;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-      {/* Top Toolbar Mode Switcher */}
+      {/* Top Mode Switcher */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -81,7 +92,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
         </button>
       </div>
 
-      {/* Minimalist Phone Chassis */}
+      {/* Phone Chassis */}
       <div className="phone-chassis">
         <div className="dynamic-island">
           <div className="camera-lens" />
@@ -89,8 +100,9 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
         </div>
 
         <div className="phone-screen">
+          {/* Status Bar */}
           <div className="phone-status-bar">
-            <span>{timeStr || '17:31'}</span>
+            <span>{timeStr || '17:40'}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Signal size={14} />
               <Wifi size={14} />
@@ -98,66 +110,135 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
             </div>
           </div>
 
+          {/* Top Bar with 3-Bar Menu Button */}
+          <div style={{
+            padding: '8px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
+          }}>
+            <button
+              onClick={() => setIsDrawerOpen(true)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: 'none',
+                borderRadius: 10,
+                padding: '6px 8px',
+                color: '#FFF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+              title="Open Side Menu"
+            >
+              <Menu size={20} />
+            </button>
+
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#FFF', textTransform: 'capitalize' }}>
+              {activeTab === 'dashboard' ? 'Expense Tracker' : activeTab}
+            </div>
+
+            <div style={{ width: 34 }} />
+          </div>
+
+          {/* Side Drawer Overlay */}
+          {isDrawerOpen && (
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 200,
+              display: 'flex'
+            }}>
+              {/* Backdrop */}
+              <div
+                onClick={() => setIsDrawerOpen(false)}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0, 0, 0, 0.65)',
+                  backdropFilter: 'blur(4px)'
+                }}
+              />
+
+              {/* Side Drawer Content */}
+              <div style={{
+                position: 'relative',
+                width: '80%',
+                height: '100%',
+                background: '#0F172A',
+                borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+                padding: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '10px 0 30px rgba(0,0,0,0.8)',
+                zIndex: 210
+              }}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 10, background: '#6366F1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+                      <Shield size={18} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#FFF' }}>Expense Tracker</div>
+                      <div style={{ fontSize: 11, color: '#94A3B8' }}>Menu & Features</div>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsDrawerOpen(false)} style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer' }}>
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Navigation Items */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, overflowY: 'auto' }}>
+                  {menuItems.map(item => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          onChangeTab(item.id as any);
+                          setIsDrawerOpen(false);
+                        }}
+                        style={{
+                          background: isActive ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                          border: isActive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
+                          borderRadius: 14,
+                          padding: '10px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          color: isActive ? '#6366F1' : '#F8FAFC',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <Icon size={18} color={isActive ? '#6366F1' : '#94A3B8'} />
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700 }}>{item.label}</div>
+                          <div style={{ fontSize: 10, color: '#64748B' }}>{item.desc}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Main Body Content */}
           <div style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '12px 16px 80px 16px',
+            padding: '12px 16px 20px 16px',
             display: 'flex',
             flexDirection: 'column'
           }}>
             {children}
-          </div>
-
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 70,
-            background: 'rgba(15, 23, 42, 0.96)',
-            backdropFilter: 'blur(20px)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-around',
-            paddingBottom: 10,
-            zIndex: 90
-          }}>
-            {[
-              { id: 'dashboard', label: 'Home', icon: Home },
-              { id: 'history', label: 'History', icon: List },
-              { id: 'analytics', label: 'Stats', icon: PieChart },
-              { id: 'budget', label: 'Budget', icon: Target },
-              { id: 'categories', label: 'Manage', icon: Tag },
-              { id: 'subscriptions', label: 'Subs', icon: RefreshCw },
-              { id: 'savings', label: 'Goals', icon: Award },
-              { id: 'settings', label: 'Settings', icon: Settings }
-            ].map(item => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onChangeTab(item.id as any)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: isActive ? '#6366F1' : '#64748B',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 3,
-                    cursor: 'pointer',
-                    fontSize: 8,
-                    fontWeight: 700,
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <Icon size={17} style={{ transform: isActive ? 'scale(1.1)' : 'scale(1)' }} />
-                  {item.label}
-                </button>
-              );
-            })}
           </div>
 
           <div className="home-indicator" />
