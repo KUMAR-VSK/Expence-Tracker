@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Search, Trash2, Utensils, ShoppingBag, Car, Zap, Film, Activity, Briefcase, Laptop, Wallet, Volume2 } from 'lucide-react';
+import { Search, Trash2, Utensils, ShoppingBag, Car, Zap, Film, Activity, Briefcase, Laptop, Wallet, Volume2, FileSpreadsheet } from 'lucide-react';
 import type { Expense } from '../types';
 
 interface TransactionsViewProps {
   expenses: Expense[];
   currency: string;
   onDeleteExpense: (id: string) => void;
+  onOpenBulkImport?: () => void;
 }
 
 const getCategoryIcon = (iconName: string) => {
@@ -25,7 +26,8 @@ const getCategoryIcon = (iconName: string) => {
 export const TransactionsView: React.FC<TransactionsViewProps> = ({
   expenses,
   currency,
-  onDeleteExpense
+  onDeleteExpense,
+  onOpenBulkImport
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'ALL' | 'EXPENSE' | 'INCOME'>('ALL');
@@ -92,6 +94,28 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
+
+        {onOpenBulkImport && (
+          <button
+            onClick={onOpenBulkImport}
+            style={{
+              background: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: 14,
+              padding: '0 12px',
+              color: '#34D399',
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+            title="Import Excel / CSV"
+          >
+            <FileSpreadsheet size={16} /> Import Excel
+          </button>
+        )}
       </div>
 
       {/* Type Filter Buttons */}

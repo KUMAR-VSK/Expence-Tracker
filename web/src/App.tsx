@@ -9,10 +9,10 @@ import { SubscriptionsView } from './components/SubscriptionsView';
 import { SavingsView } from './components/SavingsView';
 import { MiniPlayerBar } from './components/MiniPlayerBar';
 import { AddExpenseModal } from './components/AddExpenseModal';
+import { BulkImportModal } from './components/BulkImportModal';
 import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS, INITIAL_SAVINGS_GOALS } from './data/mockData';
-import type { Expense, Category, PaymentMethod, Budget, Subscription, SavingGoal, AppSettings } from './types';
+import type { Expense, Category, PaymentMethod, Budget, Subscription, SavingGoal, AppSettings, TransactionType } from './types';
 
-// APP VERSION CONFIGURATION FOR PERSISTENT DATA MIGRATION
 export const APP_VERSION = 1;
 const VERSION_KEY = 'et_app_version';
 
@@ -20,7 +20,6 @@ export function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings'>('dashboard');
   const [viewMode, setViewMode] = useState<'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN'>('PHONE_FRAME');
 
-  // Verify and record current version schema
   useEffect(() => {
     const savedVersion = localStorage.getItem(VERSION_KEY);
     if (!savedVersion) {
@@ -52,7 +51,6 @@ export function App() {
     const saved = localStorage.getItem('et_payment_methods');
     if (saved) {
       const parsed: PaymentMethod[] = JSON.parse(saved);
-      // Clean up legacy card/bank methods if upgrading from older drafts
       const filtered = parsed.filter(pm => pm.type === 'UPI' || pm.type === 'CASH');
       if (filtered.length > 0) return filtered;
     }
@@ -80,8 +78,8 @@ export function App() {
   });
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
 
-  // Persistent storage sync (Preserves data across updates)
   useEffect(() => {
     localStorage.setItem('et_expenses', JSON.stringify(expenses));
   }, [expenses]);
@@ -118,6 +116,38 @@ export function App() {
         return bgt;
       }));
     }
+  };
+
+  const handleImportBulk = (rawTransactions: Array<{
+    date: string;
+    title: string;
+    amount: number;
+    type: TransactionType;
+    categoryName: string;
+    paymentMethodName: string;
+    notes?: string;
+  }>) => {
+    const createdList: Expense[] = rawTransactions.map((t, idx) => {
+      const matchCat = categories.find(c => c.name.toLowerCase() === t.categoryName.toLowerCase()) || categories[0];
+      const matchPM = paymentMethods.find(pm => pm.name.toLowerCase().includes(t.paymentMethodName.toLowerCase())) || paymentMethods[0];
+
+      return {
+        id: `exp_${Date.now()}_${idx}`,
+        title: t.title,
+        amount: t.amount,
+        type: t.type,
+        categoryId: matchCat.id,
+        categoryName: matchCat.name,
+        categoryIcon: matchCat.icon,
+        categoryColor: matchCat.color,
+        paymentMethodId: matchPM.id,
+        paymentMethodName: matchPM.name,
+        date: t.date,
+        notes: t.notes
+      };
+    });
+
+    setExpenses(prev => [...createdList, ...prev]);
   };
 
   const handleDeleteExpense = (id: string) => {
@@ -205,6 +235,7 @@ export function App() {
             expenses={expenses}
             currency={settings.currency}
             onDeleteExpense={handleDeleteExpense}
+            onOpenBulkImport={() => setIsBulkImportOpen(true)}
           />
         )}
 
@@ -267,6 +298,13 @@ export function App() {
         paymentMethods={paymentMethods}
         currency={settings.currency}
         onAddTransaction={handleAddTransaction}
+      />
+
+      <BulkImportModal
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        currency={settings.currency}
+        onImportBulk={handleImportBulk}
       />
     </div>
   );
