@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+.kotlin
+web/node_modules
+web/dist
