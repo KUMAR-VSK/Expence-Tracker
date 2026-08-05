@@ -31,6 +31,7 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
   const [rows, setRows] = useState<EditableImportRow[]>([]);
   const [fileName, setFileName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [statusBanner, setStatusBanner] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Download Sample CSV Template
   const handleDownloadSample = () => {
@@ -156,7 +157,7 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
         ]);
       }, 400);
     } else {
-      alert('Unsupported file type. Please upload Excel (.xlsx, .csv), Photo (.png, .jpg), or PDF (.pdf)');
+      setStatusBanner({ type: 'error', text: 'Unsupported file type. Please upload Excel (.xlsx, .csv), Photo (.png, .jpg), or PDF (.pdf)' });
     }
   };
 
@@ -185,7 +186,7 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
   const handleFinalConfirm = () => {
     const validRows = rows.filter(r => r.isValid && r.amount > 0 && r.title.trim().length > 0);
     if (validRows.length === 0) {
-      alert('No valid transactions to import.');
+      setStatusBanner({ type: 'error', text: 'No valid transactions to import. Please check titles and amounts.' });
       return;
     }
 
@@ -201,7 +202,7 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
 
     setRows([]);
     setFileName('');
-    alert(`Successfully imported ${validRows.length} transactions!`);
+    setStatusBanner({ type: 'success', text: `Successfully imported ${validRows.length} transactions!` });
   };
 
   return (
@@ -209,6 +210,29 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
       <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <FileSpreadsheet size={20} style={{ color: '#10B981' }} /> Add Bulk (Excel / Photo / PDF)
       </h3>
+
+      {statusBanner && (
+        <div style={{
+          background: statusBanner.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+          border: `1px solid ${statusBanner.type === 'success' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+          borderRadius: 12,
+          padding: '10px 14px',
+          color: statusBanner.type === 'success' ? '#34D399' : '#F87171',
+          fontSize: 12,
+          fontWeight: 700,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span>{statusBanner.text}</span>
+          <button
+            onClick={() => setStatusBanner(null)}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 800 }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Accepted Formats Info Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
