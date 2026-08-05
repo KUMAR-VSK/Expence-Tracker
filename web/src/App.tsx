@@ -30,12 +30,10 @@ export function App() {
 
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     const saved = localStorage.getItem('et_expenses');
-    if (saved) {
+    if (saved !== null) {
       try {
-        const parsed: Expense[] = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
       } catch (err) {
         console.error('Error loading saved expenses:', err);
       }
@@ -45,12 +43,12 @@ export function App() {
 
   const [categories, setCategories] = useState<Category[]>(() => {
     const saved = localStorage.getItem('et_categories');
-    return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+    return saved !== null ? JSON.parse(saved) : INITIAL_CATEGORIES;
   });
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(() => {
     const saved = localStorage.getItem('et_payment_methods');
-    if (saved) {
+    if (saved !== null) {
       const parsed: PaymentMethod[] = JSON.parse(saved);
       const filtered = parsed.filter(pm => pm.type === 'UPI' || pm.type === 'CASH');
       if (filtered.length > 0) return filtered;
@@ -60,12 +58,12 @@ export function App() {
 
   const [budgets, setBudgets] = useState<Budget[]>(() => {
     const saved = localStorage.getItem('et_budgets');
-    return saved ? JSON.parse(saved) : INITIAL_BUDGETS;
+    return saved !== null ? JSON.parse(saved) : INITIAL_BUDGETS;
   });
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(() => {
     const saved = localStorage.getItem('et_subs');
-    return saved ? JSON.parse(saved) : INITIAL_SUBSCRIPTIONS;
+    return saved !== null ? JSON.parse(saved) : INITIAL_SUBSCRIPTIONS;
   });
 
   const [savingsGoals] = useState<SavingGoal[]>(INITIAL_SAVINGS_GOALS);
@@ -196,12 +194,17 @@ export function App() {
   };
 
   const handleResetAllData = () => {
-    localStorage.clear();
-    setExpenses(INITIAL_EXPENSES);
+    localStorage.setItem('et_expenses', JSON.stringify([]));
+    localStorage.setItem('et_categories', JSON.stringify(INITIAL_CATEGORIES));
+    localStorage.setItem('et_payment_methods', JSON.stringify(INITIAL_PAYMENT_METHODS));
+    localStorage.setItem('et_budgets', JSON.stringify(INITIAL_BUDGETS.map(b => ({ ...b, spentAmount: 0 }))));
+    localStorage.setItem('et_subs', JSON.stringify([]));
+    
+    setExpenses([]);
     setCategories(INITIAL_CATEGORIES);
     setPaymentMethods(INITIAL_PAYMENT_METHODS);
-    setBudgets(INITIAL_BUDGETS);
-    setSubscriptions(INITIAL_SUBSCRIPTIONS);
+    setBudgets(INITIAL_BUDGETS.map(b => ({ ...b, spentAmount: 0 })));
+    setSubscriptions([]);
     setActiveTab('dashboard');
   };
 
