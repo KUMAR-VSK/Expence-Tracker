@@ -13,6 +13,7 @@ import { AddExpenseModal } from './components/AddExpenseModal';
 import { BulkImportModal } from './components/BulkImportModal';
 import { SettingsModal } from './components/SettingsModal';
 import { LockScreen } from './components/LockScreen';
+import { ExpenseDetailModal } from './components/ExpenseDetailModal';
 import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS } from './data/mockData';
 import type { Expense, Category, PaymentMethod, Budget, Subscription, AppSettings, TransactionType } from './types';
 
@@ -87,6 +88,7 @@ export function App() {
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(!settings.isPinLocked);
+  const [viewExpense, setViewExpense] = useState<Expense | null>(null);
 
   const updateSettings = (patch: Partial<AppSettings>) => {
     setSettings(prev => ({ ...prev, ...patch }));
@@ -264,8 +266,7 @@ export function App() {
                 .filter(e => e.type === 'EXPENSE')
                 .reduce((max, e) => e.amount > max.amount ? e : max, { amount: 0 } as Expense);
               if (highest.amount > 0) {
-                setEditingExpense(highest);
-                setIsAddModalOpen(true);
+                setViewExpense(highest);
               }
             }}
           />
@@ -372,6 +373,13 @@ export function App() {
           onUnlock={() => setIsUnlocked(true)}
         />
       )}
+
+      <ExpenseDetailModal
+        isOpen={!!viewExpense}
+        onClose={() => setViewExpense(null)}
+        expense={viewExpense}
+        currency={settings.currency}
+      />
     </div>
   );
 }
