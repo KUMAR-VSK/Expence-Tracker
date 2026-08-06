@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Coins, Lock, Unlock, Download, Upload, AlertCircle, CheckCircle2, User } from 'lucide-react';
+import { X, Coins, Lock, Unlock, Download, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
 import type { AppSettings, Expense, Category, PaymentMethod, Budget, Subscription } from '../types';
 
 interface BackupData {
