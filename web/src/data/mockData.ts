@@ -1,4 +1,4 @@
-import type { Category, PaymentMethod, Expense, Budget, Subscription, SavingGoal } from '../types';
+import type { Category, PaymentMethod, Expense, Budget, Subscription } from '../types';
 
 export const INITIAL_CATEGORIES: Category[] = [
   { id: 'cat_1', name: 'Food & Dining', icon: 'Utensils', color: '#6366F1', type: 'EXPENSE' },
@@ -154,10 +154,4 @@ export const INITIAL_SUBSCRIPTIONS: Subscription[] = [
   { id: 'sub_2', name: 'Spotify Premium', amount: 119, categoryName: 'Entertainment', billingCycle: 'Monthly', dueDate: '18th', icon: 'Music', active: true },
   { id: 'sub_3', name: 'Google One 200GB', amount: 210, categoryName: 'Bills & Utilities', billingCycle: 'Monthly', dueDate: '25th', icon: 'Cloud', active: true },
   { id: 'sub_4', name: 'Cult.fit Gym Pass', amount: 1499, categoryName: 'Health & Fitness', billingCycle: 'Monthly', dueDate: '1st', icon: 'Activity', active: true }
-];
-
-export const INITIAL_SAVINGS_GOALS: SavingGoal[] = [
-  { id: 'goal_1', title: 'Emergency Fund', targetAmount: 100000, currentAmount: 65000, targetDate: '2026-12', icon: 'Shield', color: '#10B981' },
-  { id: 'goal_2', title: 'MacBook Pro M4', targetAmount: 220000, currentAmount: 140000, targetDate: '2026-11', icon: 'Laptop', color: '#6366F1' },
-  { id: 'goal_3', title: 'Goa Vacation', targetAmount: 35000, currentAmount: 22500, targetDate: '2026-10', icon: 'Sun', color: '#F59E0B' }
 ];

@@ -56,16 +56,6 @@ export interface Subscription {
   active: boolean;
 }
 
-export interface SavingGoal {
-  id: string;
-  title: string;
-  targetAmount: number;
-  currentAmount: number;
-  targetDate: string;
-  icon: string;
-  color: string;
-}
-
 export interface AppSettings {
   currency: string; // '₹', '$', '€', '£'
   darkMode: boolean;

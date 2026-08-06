@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Home, List, PieChart, Target, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet, Settings } from 'lucide-react';
+import { Home, List, PieChart, Target, RefreshCw, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet, Settings } from 'lucide-react';
 
 interface PhoneFrameProps {
-  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import';
-  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import') => void;
+  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'bulk_import';
+  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'bulk_import') => void;
   onResetAllData: () => void;
   onOpenSettings: () => void;
   children: React.ReactNode;
@@ -26,7 +26,6 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
     { id: 'budget', label: 'Budget Planner', icon: Target, desc: 'Set & monitor monthly limits' },
     { id: 'categories', label: 'Manage Categories & Payments', icon: Tag, desc: 'Add / remove categories & cards' },
     { id: 'subscriptions', label: 'Recurring Subscriptions', icon: RefreshCw, desc: 'Track Netflix, Gym & utility bills' },
-    { id: 'savings', label: 'Savings Goals', icon: Award, desc: 'Track financial targets' },
   ] as const;
 
   const [showResetModal, setShowResetModal] = useState(false);

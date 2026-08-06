@@ -8,14 +8,13 @@ import { AnalyticsView } from './components/AnalyticsView';
 import { BudgetView } from './components/BudgetView';
 import { CategoriesView } from './components/CategoriesView';
 import { SubscriptionsView } from './components/SubscriptionsView';
-import { SavingsView } from './components/SavingsView';
 import { BulkImportView } from './components/BulkImportView';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { BulkImportModal } from './components/BulkImportModal';
 import { SettingsModal } from './components/SettingsModal';
 import { LockScreen } from './components/LockScreen';
-import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS, INITIAL_SAVINGS_GOALS } from './data/mockData';
-import type { Expense, Category, PaymentMethod, Budget, Subscription, SavingGoal, AppSettings, TransactionType } from './types';
+import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS } from './data/mockData';
+import type { Expense, Category, PaymentMethod, Budget, Subscription, AppSettings, TransactionType } from './types';
 
 export const APP_VERSION = 1;
 const VERSION_KEY = 'et_app_version';
@@ -30,7 +29,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'bulk_import'>('dashboard');
 
   useEffect(() => {
     const savedVersion = safeStorage.getItem(VERSION_KEY);
@@ -74,8 +73,6 @@ export function App() {
     INITIAL_SUBSCRIPTIONS,
     (value) => (isArray<Subscription>(value) ? value : INITIAL_SUBSCRIPTIONS)
   );
-
-  const [savingsGoals] = useState<SavingGoal[]>(INITIAL_SAVINGS_GOALS);
 
   const [settings, setSettings] = usePersistentState<AppSettings>(
     'et_settings',
@@ -307,13 +304,6 @@ export function App() {
             onToggleSubscription={handleToggleSubscription}
             onAddSubscription={handleAddSubscription}
             onDeleteSubscription={handleDeleteSubscription}
-          />
-        )}
-
-        {activeTab === 'savings' && (
-          <SavingsView
-            savingsGoals={savingsGoals}
-            currency={settings.currency}
           />
         )}
 
