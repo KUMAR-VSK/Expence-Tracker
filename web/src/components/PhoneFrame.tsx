@@ -1,0 +1,401 @@
+import React, { useState } from 'react';
+import { Home, List, PieChart, Target, RefreshCw, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet, Settings } from 'lucide-react';
+
+interface PhoneFrameProps {
+  activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'bulk_import';
+  onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'bulk_import') => void;
+  onResetAllData: () => void;
+  onOpenSettings: () => void;
+  children: React.ReactNode;
+}
+
+export const PhoneFrame: React.FC<PhoneFrameProps> = ({
+  activeTab,
+  onChangeTab,
+  onResetAllData,
+  onOpenSettings,
+  children
+}) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Home, desc: 'Overview & Recent Transactions' },
+    { id: 'history', label: 'History & Search', icon: List, desc: 'View and filter all expenses' },
+    { id: 'analytics', label: 'Analytics', icon: PieChart, desc: 'Category breakdown & stats' },
+    { id: 'bulk_import', label: 'Add Bulk (CSV)', icon: FileSpreadsheet, desc: 'Upload, preview & edit bulk items' },
+    { id: 'budget', label: 'Budget Planner', icon: Target, desc: 'Set & monitor monthly limits' },
+    { id: 'categories', label: 'Manage Categories & Payments', icon: Tag, desc: 'Add / remove categories & cards' },
+    { id: 'subscriptions', label: 'Recurring Subscriptions', icon: RefreshCw, desc: 'Track Netflix, Gym & utility bills' },
+  ] as const;
+
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  const handleConfirmReset = () => {
+    onResetAllData();
+    setShowResetModal(false);
+    setIsDrawerOpen(false);
+  };
+
+  return (
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {/* Unified Screen Container */}
+      <div className="phone-chassis">
+        <div className="phone-screen">
+
+          {/* Top Bar with 3-Bar Menu Button */}
+          <div style={{
+            padding: '8px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
+          }}>
+            <button
+              onClick={() => setIsDrawerOpen(true)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: 'none',
+                borderRadius: 10,
+                padding: '6px 8px',
+                color: '#FFF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+              title="Open Side Menu"
+            >
+              <Menu size={20} />
+            </button>
+
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#FFF', textTransform: 'capitalize' }}>
+              {activeTab === 'dashboard' ? 'Expense Tracker' : activeTab}
+            </div>
+
+            <div style={{ width: 34 }} />
+          </div>
+
+          {/* Side Drawer Overlay */}
+          {isDrawerOpen && (
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 200,
+              display: 'flex'
+            }}>
+              {/* Backdrop */}
+              <div
+                onClick={() => setIsDrawerOpen(false)}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0, 0, 0, 0.65)',
+                  backdropFilter: 'blur(4px)'
+                }}
+              />
+
+              {/* Side Drawer Content */}
+              <div style={{
+                position: 'relative',
+                width: '80%',
+                height: '100%',
+                background: '#0F172A',
+                borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+                padding: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '10px 0 30px rgba(0,0,0,0.8)',
+                zIndex: 210
+              }}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 10, background: '#6366F1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+                      <Shield size={18} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#FFF' }}>Expense Tracker</div>
+                      <div style={{ fontSize: 11, color: '#94A3B8' }}>Menu & Features</div>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsDrawerOpen(false)} style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer' }}>
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Navigation Items */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, overflowY: 'auto' }}>
+                  {menuItems.map(item => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          onChangeTab(item.id as any);
+                          setIsDrawerOpen(false);
+                        }}
+                        style={{
+                          background: isActive ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                          border: isActive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
+                          borderRadius: 14,
+                          padding: '10px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          color: isActive ? '#6366F1' : '#F8FAFC',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <Icon size={18} color={isActive ? '#6366F1' : '#94A3B8'} />
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700 }}>{item.label}</div>
+                          <div style={{ fontSize: 10, color: '#64748B' }}>{item.desc}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Settings */}
+                <div style={{ paddingBottom: 12 }}>
+                  <button
+                    onClick={() => {
+                      onOpenSettings();
+                      setIsDrawerOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      border: '1px solid rgba(16, 185, 129, 0.25)',
+                      borderRadius: 12,
+                      padding: '10px 12px',
+                      color: '#10B981',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Settings size={16} /> App Settings
+                  </button>
+                </div>
+
+                {/* Reset All Data Button */}
+                <div style={{ paddingTop: 16, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <button
+                    onClick={() => setShowResetModal(true)}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(239, 68, 68, 0.12)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      borderRadius: 12,
+                      padding: '10px 12px',
+                      color: '#EF4444',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <RotateCcw size={16} /> Reset All App Data
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Reset Confirmation Modal */}
+          {showResetModal && (
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 300,
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 20
+            }}>
+              <div className="glass-card animate-fade-in" style={{
+                background: '#1E293B',
+                borderRadius: 16,
+                padding: 20,
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12,
+                border: '1px solid rgba(239, 68, 68, 0.4)'
+              }}>
+                <div style={{ width: 44, height: 44, borderRadius: 99, background: 'rgba(239, 68, 68, 0.2)', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+                  <RotateCcw size={22} />
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#FFF' }}>Reset All App Data?</div>
+                <div style={{ fontSize: 12, color: '#94A3B8' }}>
+                  This will clear all transactions, categories, payment methods, budgets, and subscriptions back to fresh defaults.
+                </div>
+
+                <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                  <button
+                    onClick={() => setShowResetModal(false)}
+                    style={{
+                      flex: 1,
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: 10,
+                      padding: '10px 0',
+                      color: '#FFF',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmReset}
+                    style={{
+                      flex: 1,
+                      background: '#EF4444',
+                      border: 'none',
+                      borderRadius: 10,
+                      padding: '10px 0',
+                      color: '#FFF',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Yes, Reset Data
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Main Body Content */}
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '12px 16px 8px 16px',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {children}
+          </div>
+
+          {/* Bottom Navigation Dock */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            padding: '8px 12px',
+            background: 'rgba(15, 23, 42, 0.95)',
+            backdropFilter: 'blur(16px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            zIndex: 40
+          }}>
+            <button
+              onClick={() => onChangeTab('dashboard')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === 'dashboard' ? '#6366F1' : '#64748B',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 10,
+                fontWeight: activeTab === 'dashboard' ? 700 : 500,
+                cursor: 'pointer'
+              }}
+            >
+              <Home size={18} />
+              <span>Home</span>
+            </button>
+
+            <button
+              onClick={() => onChangeTab('history')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === 'history' ? '#6366F1' : '#64748B',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 10,
+                fontWeight: activeTab === 'history' ? 700 : 500,
+                cursor: 'pointer'
+              }}
+            >
+              <List size={18} />
+              <span>History</span>
+            </button>
+
+            <button
+              onClick={() => onChangeTab('bulk_import')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === 'bulk_import' ? '#6366F1' : '#64748B',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 10,
+                fontWeight: activeTab === 'bulk_import' ? 700 : 500,
+                cursor: 'pointer'
+              }}
+            >
+              <FileSpreadsheet size={18} />
+              <span>Add Bulk</span>
+            </button>
+
+            <button
+              onClick={() => onChangeTab('analytics')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === 'analytics' ? '#6366F1' : '#64748B',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                fontSize: 10,
+                fontWeight: activeTab === 'analytics' ? 700 : 500,
+                cursor: 'pointer'
+              }}
+            >
+              <PieChart size={18} />
+              <span>Analytics</span>
+            </button>
+          </div>
+
+          {/* Interactive Home Indicator Bar */}
+          <div
+            onClick={() => onChangeTab('dashboard')}
+            title="Click to go Home (Dashboard)"
+            className="home-indicator"
+            style={{
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              bottom: 4
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
