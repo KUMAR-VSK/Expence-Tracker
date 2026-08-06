@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { X, Plus, Calendar } from 'lucide-react';
-import type { Category, PaymentMethod, TransactionType } from '../types';
+import React, { useState, useEffect } from 'react';
+import { X, Plus, Pencil, Calendar } from 'lucide-react';
+import type { Category, PaymentMethod, Expense, TransactionType } from '../types';
 
 interface AddExpenseModalProps {
   isOpen: boolean;
@@ -8,7 +8,21 @@ interface AddExpenseModalProps {
   categories: Category[];
   paymentMethods: PaymentMethod[];
   currency: string;
+  editing?: Expense | null;
   onAddTransaction: (newExpense: {
+    title: string;
+    amount: number;
+    type: TransactionType;
+    categoryId: string;
+    categoryName: string;
+    categoryIcon: string;
+    categoryColor: string;
+    paymentMethodId: string;
+    paymentMethodName: string;
+    date: string;
+    notes?: string;
+  }) => void;
+  onUpdateTransaction: (id: string, newExpense: {
     title: string;
     amount: number;
     type: TransactionType;
@@ -29,7 +43,9 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   categories,
   paymentMethods,
   currency,
-  onAddTransaction
+  editing,
+  onAddTransaction,
+  onUpdateTransaction
 }) => {
   const [type, setType] = useState<TransactionType>('EXPENSE');
   const [title, setTitle] = useState('');
@@ -38,6 +54,27 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   const [paymentMethodId, setPaymentMethodId] = useState(paymentMethods[0]?.id || '');
   const [txDate, setTxDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
+
+  useEffect(() => {
+    if (editing) {
+      setType(editing.type);
+      setTitle(editing.title);
+      setAmount(String(editing.amount));
+      setCategoryId(editing.categoryId);
+      setPaymentMethodId(editing.paymentMethodId);
+      setTxDate(editing.date.slice(0, 10));
+      setNotes(editing.notes || '');
+    } else {
+      setType('EXPENSE');
+      setTitle('');
+      setAmount('');
+      setCategoryId(categories[0]?.id || '');
+      setPaymentMethodId(paymentMethods[0]?.id || '');
+      setTxDate(new Date().toISOString().split('T')[0]);
+      setNotes('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing]);
 
   if (!isOpen) return null;
 
@@ -55,7 +92,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
     // Use current time offset if selected today, or 12:00 PM for past dates
     selectedDateTime.setHours(12, 0, 0, 0);
 
-    onAddTransaction({
+    const payload = {
       title,
       amount: parseFloat(amount),
       type,
@@ -67,12 +104,14 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
       paymentMethodName: selectedPM.name,
       date: selectedDateTime.toISOString(),
       notes: notes || undefined
-    });
+    };
 
-    setTitle('');
-    setAmount('');
-    setNotes('');
-    setTxDate(new Date().toISOString().split('T')[0]);
+    if (editing) {
+      onUpdateTransaction(editing.id, payload);
+    } else {
+      onAddTransaction(payload);
+    }
+
     onClose();
   };
 
@@ -108,7 +147,8 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         </button>
 
         <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Plus size={22} style={{ color: '#6366F1' }} /> Add Transaction
+          {editing ? <Pencil size={22} style={{ color: '#F59E0B' }} /> : <Plus size={22} style={{ color: '#6366F1' }} />}
+          {editing ? 'Edit Transaction' : 'Add Transaction'}
         </h3>
 
         <div style={{
@@ -290,7 +330,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
           </div>
 
           <button type="submit" className="btn-primary" style={{ marginTop: 10, width: '100%' }}>
-            Save Transaction
+            {editing ? 'Save Changes' : 'Save Transaction'}
           </button>
         </form>
       </div>

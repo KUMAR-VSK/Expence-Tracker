@@ -84,6 +84,7 @@ export function App() {
   );
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(!settings.isPinLocked);
@@ -146,6 +147,19 @@ export function App() {
 
   const handleDeleteExpense = (id: string) => {
     setExpenses(prev => prev.filter(e => e.id !== id));
+  };
+
+  const handleEditExpense = (id: string) => {
+    const target = expenses.find(e => e.id === id);
+    if (target) {
+      setEditingExpense(target);
+      setIsAddModalOpen(true);
+    }
+  };
+
+  const handleUpdateTransaction = (id: string, newTx: Omit<Expense, 'id'>) => {
+    setExpenses(prev => prev.map(e => (e.id === id ? { ...newTx, id } : e)));
+    setEditingExpense(null);
   };
 
   const handleAddCategory = (cat: Omit<Category, 'id'>) => {
@@ -227,6 +241,7 @@ export function App() {
             expenses={expenses}
             currency={settings.currency}
             onDeleteExpense={handleDeleteExpense}
+            onEditExpense={handleEditExpense}
             onOpenBulkImport={() => setIsBulkImportOpen(true)}
           />
         )}
@@ -288,11 +303,16 @@ export function App() {
 
       <AddExpenseModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditingExpense(null);
+        }}
         categories={categories}
         paymentMethods={paymentMethods}
         currency={settings.currency}
+        editing={editingExpense}
         onAddTransaction={handleAddTransaction}
+        onUpdateTransaction={handleUpdateTransaction}
       />
 
       <BulkImportModal

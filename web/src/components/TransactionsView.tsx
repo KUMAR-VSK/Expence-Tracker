@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Search, Trash2, Utensils, ShoppingBag, Car, Zap, Film, Activity, Briefcase, Laptop, Wallet, Volume2, FileSpreadsheet } from 'lucide-react';
+import { Search, Trash2, Pencil, Utensils, ShoppingBag, Car, Zap, Film, Activity, Briefcase, Laptop, Wallet, Volume2, FileSpreadsheet } from 'lucide-react';
 import type { Expense } from '../types';
 
 interface TransactionsViewProps {
   expenses: Expense[];
   currency: string;
   onDeleteExpense: (id: string) => void;
+  onEditExpense?: (id: string) => void;
   onOpenBulkImport?: () => void;
 }
 
@@ -27,6 +28,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
   expenses,
   currency,
   onDeleteExpense,
+  onEditExpense,
   onOpenBulkImport
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -205,6 +207,22 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({
                     {new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
                 </div>
+
+                {onEditExpense && (
+                  <button
+                    onClick={() => onEditExpense(exp.id)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#64748B',
+                      cursor: 'pointer',
+                      padding: 4
+                    }}
+                    title="Edit Transaction"
+                  >
+                    <Pencil size={15} color="#F59E0B" opacity={0.8} />
+                  </button>
+                )}
 
                 <button
                   onClick={() => onDeleteExpense(exp.id)}
