@@ -67,10 +67,11 @@ class MainActivity : ComponentActivity() {
                                 settings.apply {
                                     javaScriptEnabled = true
                                     domStorageEnabled = true
-                                    allowFileAccess = false
+                                    databaseEnabled = true
+                                    allowFileAccess = true
                                     allowContentAccess = true
-                                    allowFileAccessFromFileURLs = false
-                                    allowUniversalAccessFromFileURLs = false
+                                    allowFileAccessFromFileURLs = true
+                                    allowUniversalAccessFromFileURLs = true
                                     loadWithOverviewMode = true
                                     useWideViewPort = true
                                     cacheMode = WebSettings.LOAD_NO_CACHE
