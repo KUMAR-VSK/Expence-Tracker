@@ -92,6 +92,17 @@ export function App() {
     setSettings(prev => ({ ...prev, ...patch }));
   };
 
+  useEffect(() => {
+    setBudgets(prev =>
+      prev.map(bgt => {
+        const spent = expenses
+          .filter(e => e.type === 'EXPENSE' && e.categoryId === bgt.categoryId && e.date.slice(0, 7) === bgt.monthYear)
+          .reduce((sum, e) => sum + e.amount, 0);
+        return spent === bgt.spentAmount ? bgt : { ...bgt, spentAmount: spent };
+      })
+    );
+  }, [expenses, setBudgets]);
+
   const handleAddTransaction = (newTx: Omit<Expense, 'id'>) => {
     const created: Expense = {
       ...newTx,
@@ -99,15 +110,6 @@ export function App() {
     };
 
     setExpenses(prev => [created, ...prev]);
-
-    if (created.type === 'EXPENSE') {
-      setBudgets(prev => prev.map(bgt => {
-        if (bgt.categoryId === created.categoryId) {
-          return { ...bgt, spentAmount: bgt.spentAmount + created.amount };
-        }
-        return bgt;
-      }));
-    }
   };
 
   const handleImportBulk = (rawTransactions: Array<{
