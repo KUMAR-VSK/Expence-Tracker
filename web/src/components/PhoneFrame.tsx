@@ -53,7 +53,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
       {/* Top Mode Switcher */}
-      <div style={{
+      <div className="desktop-only" style={{
         display: 'flex',
         alignItems: 'center',
         gap: 8,

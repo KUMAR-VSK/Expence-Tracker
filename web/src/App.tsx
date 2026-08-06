@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { safeStorage } from './utils/safeStorage';
 import { PhoneFrame } from './components/PhoneFrame';
 import { DashboardView } from './components/DashboardView';
 import { TransactionsView } from './components/TransactionsView';
@@ -22,14 +23,14 @@ export function App() {
   const [viewMode, setViewMode] = useState<'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN'>('PHONE_FRAME');
 
   useEffect(() => {
-    const savedVersion = localStorage.getItem(VERSION_KEY);
+    const savedVersion = safeStorage.getItem(VERSION_KEY);
     if (!savedVersion) {
-      localStorage.setItem(VERSION_KEY, String(APP_VERSION));
+      safeStorage.setItem(VERSION_KEY, String(APP_VERSION));
     }
   }, []);
 
   const [expenses, setExpenses] = useState<Expense[]>(() => {
-    const saved = localStorage.getItem('et_expenses');
+    const saved = safeStorage.getItem('et_expenses');
     if (saved !== null) {
       try {
         const parsed = JSON.parse(saved);
@@ -42,12 +43,12 @@ export function App() {
   });
 
   const [categories, setCategories] = useState<Category[]>(() => {
-    const saved = localStorage.getItem('et_categories');
+    const saved = safeStorage.getItem('et_categories');
     return saved !== null ? JSON.parse(saved) : INITIAL_CATEGORIES;
   });
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(() => {
-    const saved = localStorage.getItem('et_payment_methods');
+    const saved = safeStorage.getItem('et_payment_methods');
     if (saved !== null) {
       const parsed: PaymentMethod[] = JSON.parse(saved);
       const filtered = parsed.filter(pm => pm.type === 'UPI' || pm.type === 'CASH');
@@ -57,12 +58,12 @@ export function App() {
   });
 
   const [budgets, setBudgets] = useState<Budget[]>(() => {
-    const saved = localStorage.getItem('et_budgets');
+    const saved = safeStorage.getItem('et_budgets');
     return saved !== null ? JSON.parse(saved) : INITIAL_BUDGETS;
   });
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(() => {
-    const saved = localStorage.getItem('et_subs');
+    const saved = safeStorage.getItem('et_subs');
     return saved !== null ? JSON.parse(saved) : INITIAL_SUBSCRIPTIONS;
   });
 
@@ -80,23 +81,23 @@ export function App() {
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('et_expenses', JSON.stringify(expenses));
+    safeStorage.setItem('et_expenses', JSON.stringify(expenses));
   }, [expenses]);
 
   useEffect(() => {
-    localStorage.setItem('et_categories', JSON.stringify(categories));
+    safeStorage.setItem('et_categories', JSON.stringify(categories));
   }, [categories]);
 
   useEffect(() => {
-    localStorage.setItem('et_payment_methods', JSON.stringify(paymentMethods));
+    safeStorage.setItem('et_payment_methods', JSON.stringify(paymentMethods));
   }, [paymentMethods]);
 
   useEffect(() => {
-    localStorage.setItem('et_budgets', JSON.stringify(budgets));
+    safeStorage.setItem('et_budgets', JSON.stringify(budgets));
   }, [budgets]);
 
   useEffect(() => {
-    localStorage.setItem('et_subs', JSON.stringify(subscriptions));
+    safeStorage.setItem('et_subs', JSON.stringify(subscriptions));
   }, [subscriptions]);
 
   const handleAddTransaction = (newTx: Omit<Expense, 'id'>) => {
@@ -194,12 +195,12 @@ export function App() {
   };
 
   const handleResetAllData = () => {
-    localStorage.clear();
-    localStorage.setItem('et_expenses', JSON.stringify([]));
-    localStorage.setItem('et_categories', JSON.stringify(INITIAL_CATEGORIES));
-    localStorage.setItem('et_payment_methods', JSON.stringify(INITIAL_PAYMENT_METHODS));
-    localStorage.setItem('et_budgets', JSON.stringify(INITIAL_BUDGETS.map(b => ({ ...b, spentAmount: 0 }))));
-    localStorage.setItem('et_subs', JSON.stringify([]));
+    safeStorage.clear();
+    safeStorage.setItem('et_expenses', JSON.stringify([]));
+    safeStorage.setItem('et_categories', JSON.stringify(INITIAL_CATEGORIES));
+    safeStorage.setItem('et_payment_methods', JSON.stringify(INITIAL_PAYMENT_METHODS));
+    safeStorage.setItem('et_budgets', JSON.stringify(INITIAL_BUDGETS.map(b => ({ ...b, spentAmount: 0 }))));
+    safeStorage.setItem('et_subs', JSON.stringify([]));
     
     setExpenses([]);
     setCategories(INITIAL_CATEGORIES);
