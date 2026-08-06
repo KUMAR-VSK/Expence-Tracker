@@ -47,8 +47,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Enable Chrome DevTools remote debugging
-        WebView.setWebContentsDebuggingEnabled(true)
+        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
         enableEdgeToEdge()
         setContent {
@@ -68,11 +67,10 @@ class MainActivity : ComponentActivity() {
                                 settings.apply {
                                     javaScriptEnabled = true
                                     domStorageEnabled = true
-                                    databaseEnabled = true
-                                    allowFileAccess = true
+                                    allowFileAccess = false
                                     allowContentAccess = true
-                                    allowFileAccessFromFileURLs = true
-                                    allowUniversalAccessFromFileURLs = true
+                                    allowFileAccessFromFileURLs = false
+                                    allowUniversalAccessFromFileURLs = false
                                     loadWithOverviewMode = true
                                     useWideViewPort = true
                                     cacheMode = WebSettings.LOAD_NO_CACHE
