@@ -132,9 +132,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#10B981', textTransform: 'uppercase' }}>Count</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: '#10B981', marginTop: 4 }}>
-            {expenses.length}
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase' }}>Avg Transaction</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#6366F1', marginTop: 4 }}>
+            {expenses.length > 0 ? currency + (expenses.reduce((acc, e) => acc + e.amount, 0) / expenses.length).toFixed(2) : currency + '0.00'}
           </div>
         </div>
       </div>
