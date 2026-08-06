@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, Target, Wifi, Battery, Signal, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet } from 'lucide-react';
+import React, { useState } from 'react';
+import { Home, List, PieChart, Target, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet } from 'lucide-react';
 
 interface PhoneFrameProps {
   activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import';
@@ -14,18 +14,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
   onResetAllData,
   children
 }) => {
-  const [timeStr, setTimeStr] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeStr(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, desc: 'Overview & Recent Transactions' },
@@ -48,24 +37,9 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-      {/* Phone Chassis */}
+      {/* Unified Screen Container */}
       <div className="phone-chassis">
-        <div className="dynamic-island">
-          <div className="camera-lens" />
-          <div className="sensor-dot" />
-        </div>
-
         <div className="phone-screen">
-          {/* Status Bar */}
-          <div className="phone-status-bar">
-            <span>{timeStr || '17:40'}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Signal size={14} />
-              <Wifi size={14} />
-              <Battery size={16} />
-            </div>
-          </div>
 
           {/* Top Bar with 3-Bar Menu Button */}
           <div style={{
