@@ -1,6 +1,5 @@
 import React from 'react';
 import { Wallet, ArrowUpRight, ArrowDownRight, Plus, Utensils, ShoppingBag, Car, Zap, Film, Activity, Briefcase, Laptop, Volume2 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import type { Expense, Category } from '../types';
 
 interface DashboardViewProps {
@@ -111,65 +110,33 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* 2x2 Stat Cards Grid (Matching Native APK) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <motion.div
-          className="glass-card"
-          style={{ padding: '12px 14px', borderRadius: 16, cursor: 'pointer' }}
-          onClick={onNavigateToHistory}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <div className="glass-card stat-card" style={{ padding: '12px 14px', borderRadius: 16, cursor: 'pointer' }} onClick={onNavigateToHistory}>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase' }}>Total Transactions</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#6366F1', marginTop: 4 }}>
             {expenses.length}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="glass-card"
-          style={{ padding: '12px 14px', borderRadius: 16, cursor: 'pointer' }}
-          onClick={onViewHighestExpense}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <div className="glass-card stat-card" style={{ padding: '12px 14px', borderRadius: 16, cursor: 'pointer' }} onClick={onViewHighestExpense}>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#EF4444', textTransform: 'uppercase' }}>Highest Expense</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#EF4444', marginTop: 4 }}>
             {currency}{highestExpense.toFixed(2)}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="glass-card"
-          style={{ padding: '12px 14px', borderRadius: 16 }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          whileHover={{ scale: 1.02 }}
-        >
+        <div className="glass-card stat-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase' }}>Today's Spending</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#6366F1', marginTop: 4 }}>
             {currency}{todaySpending.toFixed(2)}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="glass-card"
-          style={{ padding: '12px 14px', borderRadius: 16 }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-          whileHover={{ scale: 1.02 }}
-        >
+        <div className="glass-card stat-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#10B981', textTransform: 'uppercase' }}>Net Savings</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: totalBalance >= 0 ? '#10B981' : '#EF4444', marginTop: 4 }}>
             {currency}{totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-        </motion.div>
+        </div>
       </div>
 
       <button
