@@ -24,7 +24,6 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
   // Category form state
   const [catName, setCatName] = useState('');
   const [catType, setCatType] = useState<TransactionType>('EXPENSE');
-  const [catColor, setCatColor] = useState('#6366F1');
 
   // Payment method form state
   const [pmName, setPmName] = useState('');
@@ -34,10 +33,11 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
   const handleCreateCategory = (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName) return;
+    const defaultColor = catType === 'EXPENSE' ? '#EF4444' : '#10B981';
     onAddCategory({
       name: catName,
       type: catType,
-      color: catColor,
+      color: defaultColor,
       icon: catType === 'EXPENSE' ? 'ShoppingBag' : 'Briefcase'
     });
     setCatName('');
@@ -146,12 +146,6 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                 <option value="EXPENSE">Expense</option>
                 <option value="INCOME">Income</option>
               </select>
-              <input
-                type="color"
-                value={catColor}
-                onChange={e => setCatColor(e.target.value)}
-                style={{ width: 36, height: 36, border: 'none', background: 'none', cursor: 'pointer' }}
-              />
             </div>
             <button type="submit" className="btn-primary" style={{ padding: '8px 12px', fontSize: 13, width: '100%' }}>
               <Plus size={14} /> Add Category
