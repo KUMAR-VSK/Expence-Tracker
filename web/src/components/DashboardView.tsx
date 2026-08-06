@@ -6,6 +6,7 @@ interface DashboardViewProps {
   expenses: Expense[];
   categories?: Category[];
   currency: string;
+  userName: string;
   onOpenAddModal: () => void;
   onNavigateToHistory: () => void;
 }
@@ -27,6 +28,7 @@ const getCategoryIcon = (iconName: string) => {
 export const DashboardView: React.FC<DashboardViewProps> = ({
   expenses,
   currency,
+  userName,
   onOpenAddModal,
   onNavigateToHistory
 }) => {
@@ -57,7 +59,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>
-            Hello, Local User 👋
+            {userName ? `Hello, ${userName} 👋` : 'Hello, Local User 👋'}
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
             {todayStr}

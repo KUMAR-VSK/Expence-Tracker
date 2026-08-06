@@ -256,6 +256,7 @@ export function App() {
           <DashboardView
             expenses={expenses}
             currency={settings.currency}
+            userName={settings.userName}
             onOpenAddModal={() => setIsAddModalOpen(true)}
             onNavigateToHistory={() => setActiveTab('history')}
           />
