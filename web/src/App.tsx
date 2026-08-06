@@ -25,7 +25,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   darkMode: true,
   isPinLocked: false,
   pin: '',
-  viewMode: 'PHONE_FRAME'
+  viewMode: 'PHONE_FRAME',
+  userName: ''
 };
 
 export function App() {

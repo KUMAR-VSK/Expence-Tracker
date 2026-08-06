@@ -72,4 +72,5 @@ export interface AppSettings {
   isPinLocked: boolean;
   pin: string;
   viewMode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN';
+  userName: string;
 }

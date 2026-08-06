@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Coins, Lock, Unlock, Download, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Coins, Lock, Unlock, Download, Upload, AlertCircle, CheckCircle2, User } from 'lucide-react';
 import type { AppSettings, Expense, Category, PaymentMethod, Budget, Subscription } from '../types';
 
 interface BackupData {
@@ -56,6 +56,7 @@ const isAppSettings = (value: unknown): value is AppSettings => isRecord(value)
   && typeof value.darkMode === 'boolean'
   && typeof value.isPinLocked === 'boolean'
   && isString(value.pin)
+  && isString(value.userName)
   && (value.viewMode === 'PHONE_FRAME' || value.viewMode === 'MINI_PLAYER' || value.viewMode === 'FULL_SCREEN');
 
 const isBackupData = (value: unknown): value is BackupData => isRecord(value)
@@ -174,6 +175,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <h3 style={{ fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, color: '#FFF' }}>
           <Coins size={22} style={{ color: '#10B981' }} /> Settings
         </h3>
+
+        {/* User Name */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#94A3B8' }}>Your Name</div>
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={settings.userName}
+            onChange={(e) => onUpdateSettings({ userName: e.target.value })}
+            maxLength={30}
+            style={{
+              background: 'rgba(255, 255, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: 10,
+              padding: '12px 14px',
+              color: '#FFF',
+              fontSize: 15,
+              outline: 'none'
+            }}
+          />
+        </div>
 
         {/* Currency */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
