@@ -11,6 +11,11 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      console.log('[ExpenseTracker] HTML loaded, starting app...');
+      window.addEventListener('error', (e) => console.error('[ExpenseTracker] Window error:', e.message, e.filename, e.lineno, e.colno, e.error));
+      window.addEventListener('unhandledrejection', (e) => console.error('[ExpenseTracker] Unhandled rejection:', e.reason));
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
