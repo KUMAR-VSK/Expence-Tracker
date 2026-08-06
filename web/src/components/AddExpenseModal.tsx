@@ -84,8 +84,9 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
     e.preventDefault();
     if (!title || !amount || parseFloat(amount) <= 0 || !txDate) return;
 
-    const selectedCategory = categories.find(c => c.id === categoryId) || categories[0];
+    const selectedCategory = categories.find(c => c.id === categoryId) || filteredCategories[0];
     const selectedPM = paymentMethods.find(pm => pm.id === paymentMethodId) || paymentMethods[0];
+    if (!selectedCategory || !selectedPM) return;
 
     // Preserve selected back-date time
     const selectedDateTime = new Date(txDate);

@@ -47,7 +47,9 @@ export function App() {
   const [categories, setCategories] = usePersistentState<Category[]>(
     'et_categories',
     INITIAL_CATEGORIES,
-    (value) => (isArray<Category>(value) ? value : INITIAL_CATEGORIES)
+    (value) => (isArray<Category>(value) && value.some(c => c.type === 'EXPENSE') && value.some(c => c.type === 'INCOME')
+      ? value
+      : INITIAL_CATEGORIES)
   );
 
   const [paymentMethods, setPaymentMethods] = usePersistentState<PaymentMethod[]>(
@@ -138,11 +140,16 @@ export function App() {
     paymentMethodName: string;
     notes?: string;
   }>) => {
-    const createdList: Expense[] = rawTransactions.map((t, idx) => {
-      const matchCat = categories.find(c => c.name.toLowerCase() === t.categoryName.toLowerCase()) || categories[0];
+    const createdList = rawTransactions.flatMap((t, idx): Expense[] => {
+      const matchCat = categories.find(c => c.type === t.type && c.name.toLowerCase() === t.categoryName.toLowerCase())
+        || categories.find(c => c.type === t.type);
       const matchPM = paymentMethods.find(pm => pm.name.toLowerCase().includes(t.paymentMethodName.toLowerCase())) || paymentMethods[0];
 
-      return {
+      if (!matchCat || !matchPM) {
+        return [];
+      }
+
+      return [{
         id: `exp_${Date.now()}_${idx}`,
         title: t.title,
         amount: t.amount,
@@ -155,7 +162,7 @@ export function App() {
         paymentMethodName: matchPM.name,
         date: t.date,
         notes: t.notes
-      };
+      }];
     });
 
     setExpenses(prev => [...createdList, ...prev]);
@@ -187,7 +194,11 @@ export function App() {
   };
 
   const handleDeleteCategory = (id: string) => {
-    setCategories(prev => prev.filter(c => c.id !== id));
+    setCategories(prev => {
+      const category = prev.find(c => c.id === id);
+      if (!category || prev.filter(c => c.type === category.type).length <= 1) return prev;
+      return prev.filter(c => c.id !== id);
+    });
   };
 
   const handleAddPaymentMethod = (pm: Omit<PaymentMethod, 'id'>) => {
@@ -199,7 +210,7 @@ export function App() {
   };
 
   const handleDeletePaymentMethod = (id: string) => {
-    setPaymentMethods(prev => prev.filter(pm => pm.id !== id));
+    setPaymentMethods(prev => (prev.length <= 1 ? prev : prev.filter(pm => pm.id !== id)));
   };
 
   const handleAddSubscription = (sub: Omit<Subscription, 'id'>) => {

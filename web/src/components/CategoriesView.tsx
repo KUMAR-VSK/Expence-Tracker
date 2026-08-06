@@ -160,7 +160,10 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
 
           {/* Category List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {categories.map(cat => (
+            {categories.map(cat => {
+              const canDelete = categories.filter(category => category.type === cat.type).length > 1;
+
+              return (
               <div
                 key={cat.id}
                 style={{
@@ -183,13 +186,15 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
 
                 <button
                   onClick={() => onDeleteCategory(cat.id)}
-                  style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: 4 }}
-                  title="Remove Category"
+                  disabled={!canDelete}
+                  style={{ background: 'none', border: 'none', color: '#EF4444', cursor: canDelete ? 'pointer' : 'not-allowed', padding: 4, opacity: canDelete ? 1 : 0.35 }}
+                  title={canDelete ? 'Remove Category' : `Keep at least one ${cat.type.toLowerCase()} category`}
                 >
                   <Trash2 size={15} opacity={0.7} />
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -238,7 +243,10 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
 
           {/* Payment Method List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {paymentMethods.map(pm => (
+            {paymentMethods.map(pm => {
+              const canDelete = paymentMethods.length > 1;
+
+              return (
               <div
                 key={pm.id}
                 style={{
@@ -272,13 +280,15 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
 
                 <button
                   onClick={() => onDeletePaymentMethod(pm.id)}
-                  style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: 4 }}
-                  title="Remove Payment Method"
+                  disabled={!canDelete}
+                  style={{ background: 'none', border: 'none', color: '#EF4444', cursor: canDelete ? 'pointer' : 'not-allowed', padding: 4, opacity: canDelete ? 1 : 0.35 }}
+                  title={canDelete ? 'Remove Payment Method' : 'Keep at least one payment method'}
                 >
                   <Trash2 size={15} opacity={0.7} />
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
