@@ -9,7 +9,6 @@ import { CategoriesView } from './components/CategoriesView';
 import { SubscriptionsView } from './components/SubscriptionsView';
 import { SavingsView } from './components/SavingsView';
 import { BulkImportView } from './components/BulkImportView';
-import { MiniPlayerBar } from './components/MiniPlayerBar';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { BulkImportModal } from './components/BulkImportModal';
 import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS, INITIAL_SAVINGS_GOALS } from './data/mockData';
@@ -20,7 +19,6 @@ const VERSION_KEY = 'et_app_version';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import'>('dashboard');
-  const [viewMode, setViewMode] = useState<'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN'>('PHONE_FRAME');
 
   useEffect(() => {
     const savedVersion = safeStorage.getItem(VERSION_KEY);
@@ -211,16 +209,11 @@ export function App() {
     window.location.reload();
   };
 
-  const totalIncome = expenses.filter(e => e.type === 'INCOME').reduce((acc, e) => acc + e.amount, 0);
-  const totalExpense = expenses.filter(e => e.type === 'EXPENSE').reduce((acc, e) => acc + e.amount, 0);
-
   return (
-    <div style={{ width: '100vw', minHeight: '100vh', padding: '20px 16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div style={{ width: '100vw', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <PhoneFrame
         activeTab={activeTab}
         onChangeTab={setActiveTab}
-        viewMode={viewMode}
-        onSwitchViewMode={setViewMode}
         onResetAllData={handleResetAllData}
       >
         {activeTab === 'dashboard' && (
@@ -295,15 +288,6 @@ export function App() {
           />
         )}
       </PhoneFrame>
-
-      <MiniPlayerBar
-        totalIncome={totalIncome}
-        totalExpense={totalExpense}
-        currency={settings.currency}
-        recentExpense={expenses[0]}
-        onOpenAddModal={() => setIsAddModalOpen(true)}
-        onSwitchViewMode={setViewMode}
-      />
 
       <AddExpenseModal
         isOpen={isAddModalOpen}

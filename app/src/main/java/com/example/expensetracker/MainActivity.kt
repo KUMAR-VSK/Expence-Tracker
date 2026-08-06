@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
                     AndroidView(
                         factory = { context ->
                             val assetLoader = WebViewAssetLoader.Builder()
-                                .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
+                                .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(context))
                                 .build()
 
                             WebView(context).apply {
@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
                                     allowUniversalAccessFromFileURLs = true
                                     loadWithOverviewMode = true
                                     useWideViewPort = true
-                                    cacheMode = WebSettings.LOAD_DEFAULT
+                                    cacheMode = WebSettings.LOAD_NO_CACHE
                                     mediaPlaybackRequiresUserGesture = false
                                 }
 
@@ -130,7 +130,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
 
-                                loadUrl("https://appassets.androidplatform.net/assets/web/index.html")
+                                loadUrl("https://appassets.androidplatform.net/web/index.html")
                             }
                         },
                         modifier = Modifier.fillMaxSize()

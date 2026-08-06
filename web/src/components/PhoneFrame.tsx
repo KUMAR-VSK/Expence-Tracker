@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Home, List, PieChart, Target, Wifi, Battery, Signal, Smartphone, Minimize2, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet } from 'lucide-react';
+import { Home, List, PieChart, Target, Wifi, Battery, Signal, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet } from 'lucide-react';
 
 interface PhoneFrameProps {
   activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import';
   onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import') => void;
-  viewMode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN';
-  onSwitchViewMode: (mode: 'PHONE_FRAME' | 'MINI_PLAYER' | 'FULL_SCREEN') => void;
   onResetAllData: () => void;
   children: React.ReactNode;
 }
@@ -13,8 +11,6 @@ interface PhoneFrameProps {
 export const PhoneFrame: React.FC<PhoneFrameProps> = ({
   activeTab,
   onChangeTab,
-  viewMode,
-  onSwitchViewMode,
   onResetAllData,
   children
 }) => {
@@ -51,57 +47,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-      {/* Top Mode Switcher */}
-      <div className="desktop-only" style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        background: 'rgba(15, 23, 42, 0.8)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        padding: '6px 12px',
-        borderRadius: 99,
-        boxShadow: '0 8px 20px rgba(0,0,0,0.3)'
-      }}>
-        <button
-          onClick={() => onSwitchViewMode('PHONE_FRAME')}
-          style={{
-            background: viewMode === 'PHONE_FRAME' ? '#6366F1' : 'transparent',
-            color: '#FFF',
-            border: 'none',
-            borderRadius: 99,
-            padding: '6px 14px',
-            fontSize: 12,
-            fontWeight: 700,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6
-          }}
-        >
-          <Smartphone size={14} /> Phone Mini Player
-        </button>
-
-        <button
-          onClick={() => onSwitchViewMode('MINI_PLAYER')}
-          style={{
-            background: viewMode === 'MINI_PLAYER' ? '#6366F1' : 'transparent',
-            color: '#FFF',
-            border: 'none',
-            borderRadius: 99,
-            padding: '6px 14px',
-            fontSize: 12,
-            fontWeight: 700,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6
-          }}
-        >
-          <Minimize2 size={14} /> Floating Widget
-        </button>
-      </div>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
       {/* Phone Chassis */}
       <div className="phone-chassis">
