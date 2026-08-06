@@ -31,8 +31,6 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   currency,
   onAddTransaction
 }) => {
-  if (!isOpen) return null;
-
   const [type, setType] = useState<TransactionType>('EXPENSE');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
@@ -40,6 +38,8 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   const [paymentMethodId, setPaymentMethodId] = useState(paymentMethods[0]?.id || '');
   const [txDate, setTxDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
+
+  if (!isOpen) return null;
 
   const filteredCategories = categories.filter(c => c.type === type);
 

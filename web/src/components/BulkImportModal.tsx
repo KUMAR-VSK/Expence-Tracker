@@ -28,11 +28,11 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
   currency,
   onImportBulk
 }) => {
-  if (!isOpen) return null;
-
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([]);
   const [fileName, setFileName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+
+  if (!isOpen) return null;
 
   // Download Sample Template CSV
   const handleDownloadSample = () => {
