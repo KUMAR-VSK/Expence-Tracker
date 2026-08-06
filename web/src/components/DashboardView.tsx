@@ -9,6 +9,7 @@ interface DashboardViewProps {
   userName: string;
   onOpenAddModal: () => void;
   onNavigateToHistory: () => void;
+  onViewHighestExpense: () => void;
 }
 
 const getCategoryIcon = (iconName: string) => {
@@ -30,7 +31,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   currency,
   userName,
   onOpenAddModal,
-  onNavigateToHistory
+  onNavigateToHistory,
+  onViewHighestExpense
 }) => {
   const totalIncome = expenses.filter(e => e.type === 'INCOME').reduce((acc, e) => acc + e.amount, 0);
   const totalExpense = expenses.filter(e => e.type === 'EXPENSE').reduce((acc, e) => acc + e.amount, 0);
@@ -108,14 +110,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* 2x2 Stat Cards Grid (Matching Native APK) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#10B981', textTransform: 'uppercase' }}>Savings Rate</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: '#10B981', marginTop: 4 }}>
-            {totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome * 100).toFixed(1) : 0}%
+        <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16, cursor: 'pointer' }} onClick={onNavigateToHistory}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase' }}>Total Transactions</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#6366F1', marginTop: 4 }}>
+            {expenses.length}
           </div>
         </div>
 
-        <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
+        <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16, cursor: 'pointer' }} onClick={onViewHighestExpense}>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#EF4444', textTransform: 'uppercase' }}>Highest Expense</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#EF4444', marginTop: 4 }}>
             {currency}{highestExpense.toFixed(2)}

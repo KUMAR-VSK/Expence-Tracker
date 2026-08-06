@@ -259,6 +259,15 @@ export function App() {
             userName={settings.userName}
             onOpenAddModal={() => setIsAddModalOpen(true)}
             onNavigateToHistory={() => setActiveTab('history')}
+            onViewHighestExpense={() => {
+              const highest = expenses
+                .filter(e => e.type === 'EXPENSE')
+                .reduce((max, e) => e.amount > max.amount ? e : max, { amount: 0 } as Expense);
+              if (highest.amount > 0) {
+                setEditingExpense(highest);
+                setIsAddModalOpen(true);
+              }
+            }}
           />
         )}
 
