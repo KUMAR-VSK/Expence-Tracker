@@ -12,11 +12,21 @@ import { SavingsView } from './components/SavingsView';
 import { BulkImportView } from './components/BulkImportView';
 import { AddExpenseModal } from './components/AddExpenseModal';
 import { BulkImportModal } from './components/BulkImportModal';
+import { SettingsModal } from './components/SettingsModal';
+import { LockScreen } from './components/LockScreen';
 import { INITIAL_CATEGORIES, INITIAL_PAYMENT_METHODS, INITIAL_EXPENSES, INITIAL_BUDGETS, INITIAL_SUBSCRIPTIONS, INITIAL_SAVINGS_GOALS } from './data/mockData';
 import type { Expense, Category, PaymentMethod, Budget, Subscription, SavingGoal, AppSettings, TransactionType } from './types';
 
 export const APP_VERSION = 1;
 const VERSION_KEY = 'et_app_version';
+
+const DEFAULT_SETTINGS: AppSettings = {
+  currency: '₹',
+  darkMode: true,
+  isPinLocked: false,
+  pin: '',
+  viewMode: 'PHONE_FRAME'
+};
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import'>('dashboard');
@@ -64,16 +74,23 @@ export function App() {
 
   const [savingsGoals] = useState<SavingGoal[]>(INITIAL_SAVINGS_GOALS);
 
-  const [settings] = useState<AppSettings>({
-    currency: '₹',
-    darkMode: true,
-    isPinLocked: false,
-    pin: '1234',
-    viewMode: 'PHONE_FRAME'
-  });
+  const [settings, setSettings] = usePersistentState<AppSettings>(
+    'et_settings',
+    DEFAULT_SETTINGS,
+    (value) => {
+      if (typeof value !== 'object' || value === null) return DEFAULT_SETTINGS;
+      return { ...DEFAULT_SETTINGS, ...(value as Partial<AppSettings>) };
+    }
+  );
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(!settings.isPinLocked);
+
+  const updateSettings = (patch: Partial<AppSettings>) => {
+    setSettings(prev => ({ ...prev, ...patch }));
+  };
 
   const handleAddTransaction = (newTx: Omit<Expense, 'id'>) => {
     const created: Expense = {
@@ -192,6 +209,7 @@ export function App() {
         activeTab={activeTab}
         onChangeTab={setActiveTab}
         onResetAllData={handleResetAllData}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       >
         {activeTab === 'dashboard' && (
           <DashboardView
@@ -281,6 +299,20 @@ export function App() {
         currency={settings.currency}
         onImportBulk={handleImportBulk}
       />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        settings={settings}
+        onUpdateSettings={updateSettings}
+      />
+
+      {settings.isPinLocked && !isUnlocked && (
+        <LockScreen
+          pin={settings.pin}
+          onUnlock={() => setIsUnlocked(true)}
+        />
+      )}
     </div>
   );
 }

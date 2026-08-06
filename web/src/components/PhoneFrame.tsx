@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Home, List, PieChart, Target, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet } from 'lucide-react';
+import { Home, List, PieChart, Target, RefreshCw, Award, Tag, Menu, X, Shield, RotateCcw, FileSpreadsheet, Settings } from 'lucide-react';
 
 interface PhoneFrameProps {
   activeTab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import';
   onChangeTab: (tab: 'dashboard' | 'history' | 'analytics' | 'budget' | 'categories' | 'subscriptions' | 'savings' | 'bulk_import') => void;
   onResetAllData: () => void;
+  onOpenSettings: () => void;
   children: React.ReactNode;
 }
 
@@ -12,6 +13,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
   activeTab,
   onChangeTab,
   onResetAllData,
+  onOpenSettings,
   children
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -156,6 +158,34 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
                       </button>
                     );
                   })}
+                </div>
+
+                {/* Settings */}
+                <div style={{ paddingBottom: 12 }}>
+                  <button
+                    onClick={() => {
+                      onOpenSettings();
+                      setIsDrawerOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      border: '1px solid rgba(16, 185, 129, 0.25)',
+                      borderRadius: 12,
+                      padding: '10px 12px',
+                      color: '#10B981',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Settings size={16} /> App Settings
+                  </button>
                 </div>
 
                 {/* Reset All Data Button */}
