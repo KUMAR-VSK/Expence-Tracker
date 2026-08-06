@@ -1,6 +1,6 @@
 # Expense Tracker - Technical Architecture & Specifications (v1.0.0)
 
-A high-performance, offline-first mobile and web financial management platform built using a **Unified Mobile-First Architecture**, Android Native WebView runtime (Kotlin `2.1.0`, Hilt `2.55`, WebChromeClient), and a responsive React web engine (React 18, TypeScript 5, Vite 8).
+A high-performance, offline-first mobile and web financial management platform built on a **Unified Mobile-First Architecture**: a single responsive React web engine (React 19, TypeScript 6, Vite 8) served both on the web and inside an Android Native WebView runtime (Kotlin `2.1.0`, `WebChromeClient`).
 
 ---
 
@@ -9,20 +9,20 @@ A high-performance, offline-first mobile and web financial management platform b
 ### 1.1 Android Native & WebView Stack
 - **Language**: Kotlin `2.1.0` (Target Compatibility: JVM 17)
 - **Min SDK**: API Level `24` (Android 7.0)
-- **Target SDK**: API Level `34` (Android 14.0)
+- **Target SDK**: API Level `36`
 - **Build System**: Gradle `8.14.3` with Kotlin DSL (`build.gradle.kts`)
-- **WebView Engine**: Android `WebChromeClient` with Native File Chooser Launcher (`ActivityResultContracts.StartActivityForResult`)
-- **Dependency Injection**: Dagger Hilt `2.55` (`@HiltViewModel`, `@AndroidEntryPoint`)
-- **Database Engine**: Room ORM `2.8.4` over SQLite (`db.execSQL` thread-safe prepopulation)
+- **Runtime**: Android `WebView` loading bundled web assets via `WebViewAssetLoader` (`appassets.androidplatform.net`)
+- **WebView Engine**: `WebChromeClient` with native file chooser launcher (`ActivityResultContracts.StartActivityForResult`)
 
 ### 1.2 Web Engine & Design System
-- **Runtime / Framework**: React `18.3.1`
-- **Language**: TypeScript `5.4` (Strict Type Checking Enabled)
+- **Runtime / Framework**: React `19`
+- **Language**: TypeScript `6.0` (Strict Type Checking Enabled)
 - **Bundler / Tooling**: Vite `8.2.0` (Relative Base Path `base: './'`)
+- **Charts**: Chart.js `4.x` via `react-chartjs-2`
 - **Excel & File Parsing Engine**: SheetJS (`xlsx`)
 - **Design System**: Mobile-First Responsive Breakpoint Grid, Glassmorphic CSS3, HSL Curated Colors
 - **Iconography**: Lucide React (`lucide-react`)
-- **Persistence Engine**: Web Storage API (Safe LocalStorage Purge Engine)
+- **Persistence Engine**: Web Storage API (Safe LocalStorage Purge Engine with in-memory fallback for WebView)
 
 ---
 
@@ -80,9 +80,6 @@ A high-performance, offline-first mobile and web financial management platform b
 ### 4.1 Android Build Commands
 
 ```bash
-# Execute Unit Test Suite
-./gradlew test
-
 # Build Clean Android Debug APK
 ./gradlew assembleDebug
 ```
@@ -100,6 +97,9 @@ npm install
 
 # Run Vite Development Server
 npm run dev -- --port 5173 --host
+
+# Lint (oxlint)
+npm run lint
 
 # Build Web Bundle with Relative Asset Paths
 npm run build
