@@ -1,114 +1,103 @@
-# Expense Tracker - Technical Architecture & Specifications (v1.0.0)
+# Expense Tracker
 
-A high-performance, offline-first mobile and web financial management platform built on a **Unified Mobile-First Architecture**: a single responsive React web engine (React 19, TypeScript 6, Vite 8) served both on the web and inside an Android Native WebView runtime (Kotlin `2.1.0`, `WebChromeClient`).
+A local-first personal expense tracker with one React application for web and Android. The Android app serves the same compiled web bundle from `WebViewAssetLoader`, so its interface and data behavior match the browser build.
 
----
+## What it does
 
-## 1. Technical Stack Specifications
+- Add, edit, delete, search, and filter income and expense transactions.
+- Track category spending against monthly budgets.
+- Manage categories, Google Pay/Cash payment methods, and recurring subscriptions.
+- Preview, edit, and import CSV transactions; files are limited to 1 MB and 1,000 rows.
+- Export and restore complete JSON backups. Restore data is validated before it replaces local state.
+- Persist data locally in Web Storage, with an in-memory fallback if storage is unavailable.
+- Use a four-digit screen lock, currency selection, and full local-data reset.
 
-### 1.1 Android Native & WebView Stack
-- **Language**: Kotlin `2.1.0` (Target Compatibility: JVM 17)
-- **Min SDK**: API Level `24` (Android 7.0)
-- **Target SDK**: API Level `36`
-- **Build System**: Gradle `8.14.3` with Kotlin DSL (`build.gradle.kts`)
-- **Runtime**: Android `WebView` loading bundled web assets via `WebViewAssetLoader` (`appassets.androidplatform.net`)
-- **WebView Engine**: `WebChromeClient` with native file chooser launcher (`ActivityResultContracts.StartActivityForResult`)
+The app has no account system, server API, cloud sync, or encrypted data store. The PIN is a convenience screen lock, not a substitute for device security.
 
-### 1.2 Web Engine & Design System
-- **Runtime / Framework**: React `19`
-- **Language**: TypeScript `6.0` (Strict Type Checking Enabled)
-- **Bundler / Tooling**: Vite `8.2.0` (Relative Base Path `base: './'`)
-- **Charts**: Chart.js `4.x` via `react-chartjs-2`
-- **File Parsing Engine**: Bounded, client-side CSV parser
-- **Design System**: Mobile-First Responsive Breakpoint Grid, Glassmorphic CSS3, HSL Curated Colors
-- **Iconography**: Lucide React (`lucide-react`)
-- **Persistence Engine**: Web Storage API (Safe LocalStorage Purge Engine with in-memory fallback for WebView)
+## Architecture
 
----
-
-## 2. Key Platform Features
-
-- **Unified Mobile-First Responsive Architecture**:
-  - 100% UI, feature, and visual hierarchy parity between the Web App (`http://localhost:5173`) and the Android APK (`app-debug.apk`).
-  - Mobile-first breakpoints system supporting `360dp`, `390dp`, `412dp`, `768px`, and `1024px+` viewports.
-
-- **Add Bulk (CSV)**:
-  - Spreadsheet ingestion for CSV (`.csv`) files, limited to 1,000 rows and 1 MB.
-  - Interactive inline preview table for editing Title, Amount, Date, Category, and Payment Method before ingestion.
-  - Native file chooser launcher integrated in Android `WebChromeClient`.
-  - Downloadable pre-formatted sample `.csv` template.
-
-- **Interactive Bottom Navigation & Home Indicator**:
-  - Mobile bottom navigation dock featuring 1-tap navigation to **Home**, **History**, **Add Bulk**, and **Analytics**.
-  - Clickable Home chassis indicator bar for instant home redirection.
-
-- **Native INR (`₹`) Formatting**:
-  - Strict Indian Rupee (INR) formatting across transactions, category budgets, subscriptions, and financial goals.
-
-- **Simplified Payment Methods**:
-  - Default support for **Google Pay** and **Cash** payments without asking for sensitive card details.
-
-- **Complete In-App Data Reset**:
-  - In-app glassmorphism modal to purge all transactions, clear local storage down to 0, and cleanly refresh state.
-
----
-
-## 3. System Architecture & Responsive Breakpoints
-
-```
-+-------------------------------------------------------------------+
-|                        Unified UI Layer                           |
-|   - Mobile-First Responsive React Components                      |
-|   - 360dp | 390dp | 412dp | 768px | 1024px Breakpoint System      |
-+-------------------------------------------------------------------+
-                                  |
-            +---------------------+---------------------+
-            |                                           |
-            v                                           v
-+-----------------------+                   +-----------------------+
-|  Android Native APK   |                   |    Desktop/Mobile     |
-|   (Android WebView)   |                   |     Web Engine        |
-| - WebChromeClient     |                   | - Vite 8 Bundler      |
-| - Local Assets Engine |                   | - LocalStorage API    |
-+-----------------------+                   +-----------------------+
+```text
+React + TypeScript + Vite
+        |
+        +-- Browser: local Web Storage
+        |
+        +-- Android: Compose host -> WebViewAssetLoader -> bundled web assets
 ```
 
----
+| Area | Technology |
+| --- | --- |
+| Web app | React 19, TypeScript 6, Vite 8 |
+| Charts | Chart.js with react-chartjs-2 |
+| Android host | Kotlin, Jetpack Compose, Android WebView |
+| Minimum Android version | API 24 (Android 7.0) |
+| Data storage | Browser/WebView localStorage |
+| Import format | CSV only, parsed client-side without third-party spreadsheet code |
 
-## 4. Build, Verification, & Deployment Tasks
+The Android WebView enables debugging only in debug builds and serves app files from `https://appassets.androidplatform.net`. File-URL access is disabled; CSV files are provided through Android's document picker.
 
-### 4.1 Android Build Commands
+## CSV import format
+
+Download the in-app sample template or provide a UTF-8 CSV with these headers:
+
+```csv
+Date,Title,Amount,Type,Category,PaymentMethod,Notes
+2026-08-01,Supermarket Groceries,3500,EXPENSE,Food & Dining,Google Pay,Weekly groceries
+2026-08-02,Monthly Salary,85000,INCOME,Salary,Google Pay,August paycheck
+```
+
+`Date`, `Title`, and `Amount` are validated. `Type` must be `EXPENSE` or `INCOME`; when category or payment method is absent, the app supplies a suitable local default. Unsupported, oversized, malformed, or invalid rows are rejected instead of creating transactions.
+
+## Prerequisites
+
+- Node.js and npm
+- JDK 17
+- Android SDK API 36
+
+## Develop and verify
+
+Run all commands from the repository root.
 
 ```bash
-# Build Clean Android Debug APK
-./gradlew assembleDebug
-```
-The compiled APK artifact is generated at:
-`app/build/outputs/apk/debug/app-debug.apk`
+# Install the web dependencies
+npm --prefix web ci
 
-### 4.2 Web Engine & Asset Bundling Commands
+# Run the web app locally
+npm --prefix web run dev -- --host 0.0.0.0 --port 5173
+
+# Run web checks and create a production bundle
+npm --prefix web run lint
+npm --prefix web run build
+
+# Check production web dependencies for known vulnerabilities
+npm --prefix web audit --omit=dev
+```
+
+To package the current web bundle in the Android application, rebuild the web app and synchronize its output before assembling the APK:
 
 ```bash
-# Navigate to web directory
-cd web
-
-# Install Dependencies
-npm install
-
-# Run Vite Development Server
-npm run dev -- --port 5173 --host
-
-# Lint (oxlint)
-npm run lint
-
-# Build Web Bundle with Relative Asset Paths
-npm run build
-
-# Bundle Web Assets into Android APK Assets
-mkdir -p app/src/main/assets/web && cp -r web/dist/* app/src/main/assets/web/
+npm --prefix web run build
+rsync -a --delete web/dist/ app/src/main/assets/web/
+./gradlew testDebugUnitTest assembleDebug
 ```
 
----
+The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
-## 5. License
+## Project layout
+
+```text
+app/                    Android Compose/WebView host
+app/src/main/assets/web Compiled web bundle packaged in the APK
+web/src/                React application source
+web/src/utils/          Local persistence and bounded CSV parsing
+```
+
+## Notes for contributors
+
+- Keep `app/src/main/assets/web/` synchronized with `web/dist/` whenever changing web code; Android ships the bundled assets, not `web/src/`.
+- Do not reintroduce a third-party spreadsheet parser without a current security review. The previous spreadsheet dependency had high-severity advisories.
+- Keep at least one expense category, income category, and payment method. The UI and state handlers enforce this invariant.
+- Validate the web build and Android debug build before submitting changes.
+
+## License
+
 Distributed under the MIT License.

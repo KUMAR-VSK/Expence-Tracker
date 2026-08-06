@@ -98,7 +98,15 @@ class MainActivity : ComponentActivity() {
                                 webChromeClient = object : WebChromeClient() {
                                     override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                                         consoleMessage?.let {
-                                            Log.d("WebViewConsole", "${it.message()} -- From line ${it.lineNumber()} of ${it.sourceId()}")
+                                            val level = when (it.messageLevel()) {
+                                                ConsoleMessage.MessageLevel.ERROR -> "ERROR"
+                                                ConsoleMessage.MessageLevel.WARNING -> "WARN"
+                                                ConsoleMessage.MessageLevel.LOG -> "LOG"
+                                                ConsoleMessage.MessageLevel.DEBUG -> "DEBUG"
+                                                ConsoleMessage.MessageLevel.TIP -> "TIP"
+                                                else -> "UNKNOWN"
+                                            }
+                                            Log.d("WebViewConsole", "[$level] ${it.message()} -- Line ${it.lineNumber()} of ${it.sourceId()}")
                                         }
                                         return true
                                     }
