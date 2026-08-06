@@ -22,7 +22,7 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: Home, desc: 'Overview & Recent Transactions' },
     { id: 'history', label: 'History & Search', icon: List, desc: 'View and filter all expenses' },
     { id: 'analytics', label: 'Analytics', icon: PieChart, desc: 'Category breakdown & stats' },
-    { id: 'bulk_import', label: 'Add Bulk (Excel / Photo / PDF)', icon: FileSpreadsheet, desc: 'Upload, preview & edit bulk items' },
+    { id: 'bulk_import', label: 'Add Bulk (Excel / CSV)', icon: FileSpreadsheet, desc: 'Upload, preview & edit bulk items' },
     { id: 'budget', label: 'Budget Planner', icon: Target, desc: 'Set & monitor monthly limits' },
     { id: 'categories', label: 'Manage Categories & Payments', icon: Tag, desc: 'Add / remove categories & cards' },
     { id: 'subscriptions', label: 'Recurring Subscriptions', icon: RefreshCw, desc: 'Track Netflix, Gym & utility bills' },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileSpreadsheet, Image as ImageIcon, FileText, Download, Upload, Edit3, Trash2, Check, Plus } from 'lucide-react';
+import { FileSpreadsheet, Download, Upload, Edit3, Trash2, Check, Plus } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import type { Category, PaymentMethod, TransactionType } from '../types';
 
@@ -51,7 +51,7 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
     document.body.removeChild(link);
   };
 
-  // Process File Upload (Excel, CSV, Image, PDF)
+  // Process spreadsheet upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -100,64 +100,8 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
         }
       };
       reader.readAsArrayBuffer(file);
-    } else if (ext === 'png' || ext === 'jpg' || ext === 'jpeg' || ext === 'webp') {
-      // Simulate OCR scanning on receipt image
-      setTimeout(() => {
-        setRows([
-          {
-            id: `row_img_1`,
-            date: new Date().toISOString().split('T')[0],
-            title: 'Scan: Retail Supermarket',
-            amount: 1450.00,
-            type: 'EXPENSE',
-            categoryName: 'Shopping',
-            paymentMethodName: 'Google Pay',
-            notes: 'Extracted from uploaded receipt photo',
-            isValid: true
-          },
-          {
-            id: `row_img_2`,
-            date: new Date().toISOString().split('T')[0],
-            title: 'Scan: Restaurant Bill',
-            amount: 820.00,
-            type: 'EXPENSE',
-            categoryName: 'Food & Dining',
-            paymentMethodName: 'Cash',
-            notes: 'Receipt photo OCR',
-            isValid: true
-          }
-        ]);
-      }, 400);
-    } else if (ext === 'pdf') {
-      // Simulate PDF Bank Statement / Invoice extraction
-      setTimeout(() => {
-        setRows([
-          {
-            id: `row_pdf_1`,
-            date: new Date().toISOString().split('T')[0],
-            title: 'PDF Statement: Internet Provider',
-            amount: 1199.00,
-            type: 'EXPENSE',
-            categoryName: 'Bills & Utilities',
-            paymentMethodName: 'Google Pay',
-            notes: 'Extracted from PDF invoice',
-            isValid: true
-          },
-          {
-            id: `row_pdf_2`,
-            date: new Date().toISOString().split('T')[0],
-            title: 'PDF Statement: Freelance Payout',
-            amount: 25000.00,
-            type: 'INCOME',
-            categoryName: 'Freelance',
-            paymentMethodName: 'Google Pay',
-            notes: 'Extracted from PDF statement',
-            isValid: true
-          }
-        ]);
-      }, 400);
     } else {
-      setStatusBanner({ type: 'error', text: 'Unsupported file type. Please upload Excel (.xlsx, .csv), Photo (.png, .jpg), or PDF (.pdf)' });
+      setStatusBanner({ type: 'error', text: 'Unsupported file type. Please upload an Excel (.xlsx, .xls) or CSV (.csv) file.' });
     }
   };
 
@@ -208,7 +152,7 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <FileSpreadsheet size={20} style={{ color: '#10B981' }} /> Add Bulk (Excel / Photo / PDF)
+        <FileSpreadsheet size={20} style={{ color: '#10B981' }} /> Add Bulk (Excel / CSV)
       </h3>
 
       {statusBanner && (
@@ -235,23 +179,11 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
       )}
 
       {/* Accepted Formats Info Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 8 }}>
         <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 12, padding: 10, textAlign: 'center' }}>
           <FileSpreadsheet size={20} style={{ color: '#10B981', margin: '0 auto 4px auto' }} />
           <div style={{ fontSize: 11, fontWeight: 700, color: '#FFF' }}>Excel / CSV</div>
-          <div style={{ fontSize: 9, color: '#94A3B8' }}>.xlsx, .csv</div>
-        </div>
-
-        <div style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: 12, padding: 10, textAlign: 'center' }}>
-          <ImageIcon size={20} style={{ color: '#818CF8', margin: '0 auto 4px auto' }} />
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#FFF' }}>Photo / Receipt</div>
-          <div style={{ fontSize: 9, color: '#94A3B8' }}>.png, .jpg</div>
-        </div>
-
-        <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: 12, padding: 10, textAlign: 'center' }}>
-          <FileText size={20} style={{ color: '#F59E0B', margin: '0 auto 4px auto' }} />
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#FFF' }}>PDF Document</div>
-          <div style={{ fontSize: 9, color: '#94A3B8' }}>.pdf statement</div>
+          <div style={{ fontSize: 9, color: '#94A3B8' }}>.xlsx, .xls, .csv</div>
         </div>
       </div>
 
@@ -274,7 +206,7 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
             gap: 6
           }}
         >
-          <Download size={14} /> Download Sample Excel Template (.csv)
+          <Download size={14} /> Download Sample CSV Template
         </button>
 
         <label style={{
@@ -291,12 +223,12 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
         }}>
           <Upload size={24} style={{ color: '#10B981' }} />
           <div style={{ fontSize: 13, fontWeight: 600, color: '#FFF' }}>
-            {fileName ? fileName : 'Upload Excel (.xlsx, .csv), Photo (.jpg), or PDF (.pdf)'}
+            {fileName ? fileName : 'Upload an Excel (.xlsx, .xls) or CSV (.csv) file'}
           </div>
-          <div style={{ fontSize: 10, color: '#94A3B8' }}>Extracts transactions for preview confirmation & inline editing</div>
+          <div style={{ fontSize: 10, color: '#94A3B8' }}>Preview and edit transactions before saving them</div>
           <input
             type="file"
-            accept=".xlsx, .xls, .csv, .png, .jpg, .jpeg, .webp, .pdf"
+            accept=".xlsx, .xls, .csv"
             onChange={handleFileUpload}
             style={{ display: 'none' }}
           />

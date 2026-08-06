@@ -32,8 +32,8 @@ A high-performance, offline-first mobile and web financial management platform b
   - 100% UI, feature, and visual hierarchy parity between the Web App (`http://localhost:5173`) and the Android APK (`app-debug.apk`).
   - Mobile-first breakpoints system supporting `360dp`, `390dp`, `412dp`, `768px`, and `1024px+` viewports.
 
-- **Add Bulk (Excel / Photo OCR / PDF Statements)**:
-  - Multi-format ingestion for spreadsheets (`.xlsx`, `.csv`), receipt photo scans (`.png`, `.jpg`), and PDF invoices (`.pdf`).
+- **Add Bulk (Excel / CSV)**:
+  - Spreadsheet ingestion for Excel (`.xlsx`, `.xls`) and CSV (`.csv`) files.
   - Interactive inline preview table for editing Title, Amount, Date, Category, and Payment Method before ingestion.
   - Native file chooser launcher integrated in Android `WebChromeClient`.
   - Downloadable pre-formatted sample `.csv` template.
