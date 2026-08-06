@@ -48,9 +48,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     .filter(e => e.type === 'EXPENSE')
     .reduce((max, e) => e.amount > max ? e.amount : max, 0);
 
-  const currentDay = now.getDate();
-  const avgDaily = currentDay > 0 ? totalExpense / currentDay : 0;
-
   const recentExpenses = expenses.slice(0, 5);
 
   return (
@@ -112,9 +109,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* 2x2 Stat Cards Grid (Matching Native APK) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         <div className="glass-card" style={{ padding: '12px 14px', borderRadius: 16 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Daily Average</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>
-            {currency}{avgDaily.toFixed(2)}
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#10B981', textTransform: 'uppercase' }}>Savings Rate</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#10B981', marginTop: 4 }}>
+            {totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome * 100).toFixed(1) : 0}%
           </div>
         </div>
 
