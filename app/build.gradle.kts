@@ -65,6 +65,9 @@ dependencies {
   // Material Icons Extended for premium icons
   implementation("androidx.compose.material:material-icons-extended")
 
+  // AndroidX WebKit for WebViewAssetLoader
+  implementation("androidx.webkit:webkit:1.11.0")
+
   // Tooling
   debugImplementation(libs.androidx.compose.ui.tooling)
   // Instrumented tests

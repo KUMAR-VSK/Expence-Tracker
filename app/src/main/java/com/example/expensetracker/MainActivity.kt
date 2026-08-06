@@ -3,8 +3,12 @@ package com.example.expensetracker
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.webkit.ConsoleMessage
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -17,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.webkit.WebViewAssetLoader
 import com.example.expensetracker.theme.ExpenseTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,6 +49,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Enable Chrome DevTools remote debugging
+        WebView.setWebContentsDebuggingEnabled(true)
+
         enableEdgeToEdge()
         setContent {
             ExpenseTrackerTheme {
@@ -53,17 +61,52 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AndroidView(
                         factory = { context ->
+                            val assetLoader = WebViewAssetLoader.Builder()
+                                .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
+                                .build()
+
                             WebView(context).apply {
-                                settings.javaScriptEnabled = true
-                                settings.domStorageEnabled = true
-                                settings.databaseEnabled = true
-                                settings.allowFileAccess = true
-                                settings.allowContentAccess = true
-                                settings.loadWithOverviewMode = true
-                                settings.useWideViewPort = true
-                                settings.cacheMode = WebSettings.LOAD_DEFAULT
-                                webViewClient = WebViewClient()
+                                @Suppress("DEPRECATION")
+                                settings.apply {
+                                    javaScriptEnabled = true
+                                    domStorageEnabled = true
+                                    databaseEnabled = true
+                                    allowFileAccess = true
+                                    allowContentAccess = true
+                                    allowFileAccessFromFileURLs = true
+                                    allowUniversalAccessFromFileURLs = true
+                                    loadWithOverviewMode = true
+                                    useWideViewPort = true
+                                    cacheMode = WebSettings.LOAD_DEFAULT
+                                    mediaPlaybackRequiresUserGesture = false
+                                }
+
+                                webViewClient = object : WebViewClient() {
+                                    override fun shouldInterceptRequest(
+                                        view: WebView?,
+                                        request: WebResourceRequest?
+                                    ): WebResourceResponse? {
+                                        return request?.url?.let { assetLoader.shouldInterceptRequest(it) }
+                                    }
+
+                                    override fun onReceivedError(
+                                        view: WebView?,
+                                        errorCode: Int,
+                                        description: String?,
+                                        failingUrl: String?
+                                    ) {
+                                        Log.e("WebViewError", "Error $errorCode: $description on $failingUrl")
+                                    }
+                                }
+
                                 webChromeClient = object : WebChromeClient() {
+                                    override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                                        consoleMessage?.let {
+                                            Log.d("WebViewConsole", "${it.message()} -- From line ${it.lineNumber()} of ${it.sourceId()}")
+                                        }
+                                        return true
+                                    }
+
                                     override fun onShowFileChooser(
                                         webView: WebView?,
                                         filePathCallbackIn: ValueCallback<Array<Uri>>?,
@@ -86,7 +129,8 @@ class MainActivity : ComponentActivity() {
                                         return true
                                     }
                                 }
-                                loadUrl("file:///android_asset/web/index.html")
+
+                                loadUrl("https://appassets.androidplatform.net/assets/web/index.html")
                             }
                         },
                         modifier = Modifier.fillMaxSize()
