@@ -93,6 +93,22 @@ export function App() {
     setSettings(prev => ({ ...prev, ...patch }));
   };
 
+  const handleImport = (data: {
+    expenses: Expense[];
+    categories: Category[];
+    paymentMethods: PaymentMethod[];
+    budgets: Budget[];
+    subscriptions: Subscription[];
+    settings: AppSettings;
+  }) => {
+    setExpenses(data.expenses);
+    setCategories(data.categories);
+    setPaymentMethods(data.paymentMethods);
+    setBudgets(data.budgets);
+    setSubscriptions(data.subscriptions);
+    setSettings(data.settings);
+  };
+
   useEffect(() => {
     setBudgets(prev =>
       prev.map(bgt => {
@@ -327,6 +343,15 @@ export function App() {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onUpdateSettings={updateSettings}
+        backupData={{
+          expenses,
+          categories,
+          paymentMethods,
+          budgets,
+          subscriptions,
+          settings
+        }}
+        onImport={handleImport}
       />
 
       {settings.isPinLocked && !isUnlocked && (

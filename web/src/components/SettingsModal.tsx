@@ -1,12 +1,28 @@
 import React, { useState } from 'react';
-import { X, Coins, Lock, Unlock } from 'lucide-react';
-import type { AppSettings } from '../types';
+import { X, Coins, Lock, Unlock, Download, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
+import type { AppSettings, Expense, Category, PaymentMethod, Budget, Subscription } from '../types';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: AppSettings;
   onUpdateSettings: (patch: Partial<AppSettings>) => void;
+  backupData: {
+    expenses: Expense[];
+    categories: Category[];
+    paymentMethods: PaymentMethod[];
+    budgets: Budget[];
+    subscriptions: Subscription[];
+    settings: AppSettings;
+  };
+  onImport: (data: {
+    expenses: Expense[];
+    categories: Category[];
+    paymentMethods: PaymentMethod[];
+    budgets: Budget[];
+    subscriptions: Subscription[];
+    settings: AppSettings;
+  }) => void;
 }
 
 const CURRENCIES = ['₹', '$', '€', '£'] as const;
@@ -15,12 +31,50 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   settings,
-  onUpdateSettings
+  onUpdateSettings,
+  backupData,
+  onImport
 }) => {
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState('');
+  const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   if (!isOpen) return null;
+
+  const handleExport = () => {
+    const data = JSON.stringify(backupData, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `expense-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const content = evt.target?.result as string;
+        const parsed = JSON.parse(content);
+        // Basic shape validation
+        if (!parsed.expenses || !parsed.categories || !parsed.paymentMethods || !parsed.budgets || !parsed.subscriptions || !parsed.settings) {
+          throw new Error('Invalid backup format');
+        }
+        onImport(parsed);
+        setImportStatus({ type: 'success', message: 'Import successful! Data restored.' });
+      } catch (err) {
+        setImportStatus({ type: 'error', message: 'Failed to import: invalid or corrupted file' });
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   const handleEnablePin = () => {
     const pin = pinInput.trim();
@@ -161,6 +215,60 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {pinError && <div style={{ fontSize: 12, color: '#EF4444' }}>{pinError}</div>}
+        </div>
+
+        {/* Backup & Restore */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#94A3B8' }}>Backup & Restore</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={handleExport}
+              style={{
+                flex: 1,
+                background: 'rgba(99, 102, 241, 0.1)',
+                border: '1px solid rgba(99, 102, 241, 0.3)',
+                borderRadius: 10,
+                padding: '10px 12px',
+                color: '#818CF8',
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6
+              }}
+            >
+              <Download size={14} /> Export Data (.json)
+            </button>
+            <label style={{
+              flex: 1,
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: 10,
+              padding: '10px 12px',
+              color: '#34D399',
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6
+            }}>
+              <Upload size={14} /> Import Data
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleFileImport}
+                style={{ display: 'none' }}
+              />
+            </label>
+          </div>
+          {importStatus && <div style={{ fontSize: 12, color: importStatus.type === 'success' ? '#10B981' : '#EF4444', display: 'flex', alignItems: 'center', gap: 6 }}>
+            {importStatus.type === 'success' ? <CheckCircle2 size={13} /> : <AlertCircle size={13} />}
+            {importStatus.message}
+          </div>}
         </div>
       </div>
     </div>
