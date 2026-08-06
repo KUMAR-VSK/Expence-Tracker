@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { safeStorage } from './utils/safeStorage';
+import { usePersistentState, isArray } from './utils/usePersistentState';
 import { PhoneFrame } from './components/PhoneFrame';
 import { DashboardView } from './components/DashboardView';
 import { TransactionsView } from './components/TransactionsView';
@@ -27,43 +28,39 @@ export function App() {
     }
   }, []);
 
-  const [expenses, setExpenses] = useState<Expense[]>(() => {
-    const saved = safeStorage.getItem('et_expenses');
-    if (saved !== null) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
-      } catch (err) {
-        console.error('Error loading saved expenses:', err);
-      }
+  const [expenses, setExpenses] = usePersistentState<Expense[]>(
+    'et_expenses',
+    INITIAL_EXPENSES,
+    (value) => (isArray<Expense>(value) ? value : INITIAL_EXPENSES)
+  );
+
+  const [categories, setCategories] = usePersistentState<Category[]>(
+    'et_categories',
+    INITIAL_CATEGORIES,
+    (value) => (isArray<Category>(value) ? value : INITIAL_CATEGORIES)
+  );
+
+  const [paymentMethods, setPaymentMethods] = usePersistentState<PaymentMethod[]>(
+    'et_payment_methods',
+    INITIAL_PAYMENT_METHODS,
+    (value) => {
+      if (!isArray<PaymentMethod>(value)) return INITIAL_PAYMENT_METHODS;
+      const filtered = value.filter(pm => pm.type === 'UPI' || pm.type === 'CASH');
+      return filtered.length > 0 ? filtered : INITIAL_PAYMENT_METHODS;
     }
-    return INITIAL_EXPENSES;
-  });
+  );
 
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const saved = safeStorage.getItem('et_categories');
-    return saved !== null ? JSON.parse(saved) : INITIAL_CATEGORIES;
-  });
+  const [budgets, setBudgets] = usePersistentState<Budget[]>(
+    'et_budgets',
+    INITIAL_BUDGETS,
+    (value) => (isArray<Budget>(value) ? value : INITIAL_BUDGETS)
+  );
 
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(() => {
-    const saved = safeStorage.getItem('et_payment_methods');
-    if (saved !== null) {
-      const parsed: PaymentMethod[] = JSON.parse(saved);
-      const filtered = parsed.filter(pm => pm.type === 'UPI' || pm.type === 'CASH');
-      if (filtered.length > 0) return filtered;
-    }
-    return INITIAL_PAYMENT_METHODS;
-  });
-
-  const [budgets, setBudgets] = useState<Budget[]>(() => {
-    const saved = safeStorage.getItem('et_budgets');
-    return saved !== null ? JSON.parse(saved) : INITIAL_BUDGETS;
-  });
-
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>(() => {
-    const saved = safeStorage.getItem('et_subs');
-    return saved !== null ? JSON.parse(saved) : INITIAL_SUBSCRIPTIONS;
-  });
+  const [subscriptions, setSubscriptions] = usePersistentState<Subscription[]>(
+    'et_subs',
+    INITIAL_SUBSCRIPTIONS,
+    (value) => (isArray<Subscription>(value) ? value : INITIAL_SUBSCRIPTIONS)
+  );
 
   const [savingsGoals] = useState<SavingGoal[]>(INITIAL_SAVINGS_GOALS);
 
@@ -77,26 +74,6 @@ export function App() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
-
-  useEffect(() => {
-    safeStorage.setItem('et_expenses', JSON.stringify(expenses));
-  }, [expenses]);
-
-  useEffect(() => {
-    safeStorage.setItem('et_categories', JSON.stringify(categories));
-  }, [categories]);
-
-  useEffect(() => {
-    safeStorage.setItem('et_payment_methods', JSON.stringify(paymentMethods));
-  }, [paymentMethods]);
-
-  useEffect(() => {
-    safeStorage.setItem('et_budgets', JSON.stringify(budgets));
-  }, [budgets]);
-
-  useEffect(() => {
-    safeStorage.setItem('et_subs', JSON.stringify(subscriptions));
-  }, [subscriptions]);
 
   const handleAddTransaction = (newTx: Omit<Expense, 'id'>) => {
     const created: Expense = {
