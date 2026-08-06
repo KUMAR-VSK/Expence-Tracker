@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, FileSpreadsheet, Download, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
-import * as XLSX from 'xlsx';
 import type { TransactionType } from '../types';
+import { MAX_CSV_FILE_SIZE, parseCsvTransactions } from '../utils/csvImport';
 
 interface ParsedRow {
   date: string;
@@ -52,7 +52,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
     document.body.removeChild(link);
   };
 
-  // Process File Upload (.xlsx, .xls, .csv)
+  // Process CSV upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -60,47 +60,27 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
     setFileName(file.name);
     setIsProcessing(true);
 
+    if (!file.name.toLowerCase().endsWith('.csv') || file.size > MAX_CSV_FILE_SIZE) {
+      setParsedRows([]);
+      setIsProcessing(false);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (evt) => {
       try {
-        const data = new Uint8Array(evt.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rawJson: any[] = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
-
-        const rows: ParsedRow[] = rawJson.map((row) => {
-          const rawDate = row['Date'] || row['date'] || new Date().toISOString().split('T')[0];
-          const rawTitle = row['Title'] || row['title'] || row['Description'] || 'Imported Transaction';
-          const rawAmount = parseFloat(row['Amount'] || row['amount'] || 0);
-          const rawType = (row['Type'] || row['type'] || 'EXPENSE').toString().toUpperCase();
-          const rawCat = row['Category'] || row['category'] || 'General';
-          const rawPM = row['PaymentMethod'] || row['paymentmethod'] || row['Payment'] || 'Google Pay';
-          const rawNotes = row['Notes'] || row['notes'] || '';
-
-          const type: TransactionType = rawType === 'INCOME' ? 'INCOME' : 'EXPENSE';
-          const isValid = !isNaN(rawAmount) && rawAmount > 0 && rawTitle.trim().length > 0;
-
-          return {
-            date: new Date(rawDate).toISOString().split('T')[0],
-            title: rawTitle.toString().trim(),
-            amount: isNaN(rawAmount) ? 0 : rawAmount,
-            type,
-            categoryName: rawCat.toString().trim(),
-            paymentMethodName: rawPM.toString().trim(),
-            notes: rawNotes.toString().trim() || undefined,
-            isValid,
-            error: !isValid ? 'Invalid amount or missing title' : undefined
-          };
-        });
-
-        setParsedRows(rows);
-      } catch (err) {
-        console.error('Error parsing excel file:', err);
+        setParsedRows(parseCsvTransactions(String(evt.target?.result || ''), {
+          expenseCategory: 'General',
+          incomeCategory: 'Income',
+          paymentMethod: 'Cash'
+        }));
+      } catch {
+        setParsedRows([]);
       } finally {
         setIsProcessing(false);
       }
     };
-    reader.readAsArrayBuffer(file);
+    reader.readAsText(file);
   };
 
   const validRows = parsedRows.filter(r => r.isValid);
@@ -159,7 +139,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
         </button>
 
         <h3 style={{ fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, color: '#FFF' }}>
-          <FileSpreadsheet size={22} style={{ color: '#10B981' }} /> Bulk Import Excel / CSV
+          <FileSpreadsheet size={22} style={{ color: '#10B981' }} /> Bulk Import CSV
         </h3>
 
         {/* Action Buttons */}
@@ -201,12 +181,12 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
         }}>
           <Upload size={24} style={{ color: '#10B981' }} />
           <div style={{ fontSize: 13, fontWeight: 600, color: '#FFF' }}>
-            {fileName ? fileName : 'Click to select Excel (.xlsx, .xls) or CSV file'}
+            {fileName ? fileName : 'Click to select a CSV file'}
           </div>
           <div style={{ fontSize: 11, color: '#94A3B8' }}>Supports headers: Date, Title, Amount, Type, Category, PaymentMethod</div>
           <input
             type="file"
-            accept=".xlsx, .xls, .csv"
+            accept=".csv,text/csv"
             onChange={handleFileUpload}
             style={{ display: 'none' }}
           />

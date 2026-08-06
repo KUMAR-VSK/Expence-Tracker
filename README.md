@@ -19,7 +19,7 @@ A high-performance, offline-first mobile and web financial management platform b
 - **Language**: TypeScript `6.0` (Strict Type Checking Enabled)
 - **Bundler / Tooling**: Vite `8.2.0` (Relative Base Path `base: './'`)
 - **Charts**: Chart.js `4.x` via `react-chartjs-2`
-- **Excel & File Parsing Engine**: SheetJS (`xlsx`)
+- **File Parsing Engine**: Bounded, client-side CSV parser
 - **Design System**: Mobile-First Responsive Breakpoint Grid, Glassmorphic CSS3, HSL Curated Colors
 - **Iconography**: Lucide React (`lucide-react`)
 - **Persistence Engine**: Web Storage API (Safe LocalStorage Purge Engine with in-memory fallback for WebView)
@@ -32,8 +32,8 @@ A high-performance, offline-first mobile and web financial management platform b
   - 100% UI, feature, and visual hierarchy parity between the Web App (`http://localhost:5173`) and the Android APK (`app-debug.apk`).
   - Mobile-first breakpoints system supporting `360dp`, `390dp`, `412dp`, `768px`, and `1024px+` viewports.
 
-- **Add Bulk (Excel / CSV)**:
-  - Spreadsheet ingestion for Excel (`.xlsx`, `.xls`) and CSV (`.csv`) files.
+- **Add Bulk (CSV)**:
+  - Spreadsheet ingestion for CSV (`.csv`) files, limited to 1,000 rows and 1 MB.
   - Interactive inline preview table for editing Title, Amount, Date, Category, and Payment Method before ingestion.
   - Native file chooser launcher integrated in Android `WebChromeClient`.
   - Downloadable pre-formatted sample `.csv` template.

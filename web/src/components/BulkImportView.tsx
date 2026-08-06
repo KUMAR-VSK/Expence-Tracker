@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FileSpreadsheet, Download, Upload, Edit3, Trash2, Check, Plus } from 'lucide-react';
-import * as XLSX from 'xlsx';
 import type { Category, PaymentMethod, TransactionType } from '../types';
+import { MAX_CSV_FILE_SIZE, parseCsvTransactions } from '../utils/csvImport';
 
 export interface EditableImportRow {
   id: string;
@@ -60,48 +60,31 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
 
     const ext = file.name.split('.').pop()?.toLowerCase();
 
-    if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
+    if (ext === 'csv') {
+      if (file.size > MAX_CSV_FILE_SIZE) {
+        setStatusBanner({ type: 'error', text: 'CSV files must be 1 MB or smaller.' });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (evt) => {
         try {
-          const data = new Uint8Array(evt.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rawJson: any[] = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
-
-          const extractedRows: EditableImportRow[] = rawJson.map((row, idx) => {
-            const rawDate = row['Date'] || row['date'] || new Date().toISOString().split('T')[0];
-            const rawTitle = row['Title'] || row['title'] || row['Description'] || 'Imported Expense';
-            const rawAmount = parseFloat(row['Amount'] || row['amount'] || 0);
-            const rawType = (row['Type'] || row['type'] || 'EXPENSE').toString().toUpperCase();
-            const rawCat = row['Category'] || row['category'] || categories[0]?.name || 'Food & Dining';
-            const rawPM = row['PaymentMethod'] || row['paymentmethod'] || paymentMethods[0]?.name || 'Google Pay';
-            const rawNotes = row['Notes'] || row['notes'] || '';
-
-            const type: TransactionType = rawType === 'INCOME' ? 'INCOME' : 'EXPENSE';
-            const isValid = !isNaN(rawAmount) && rawAmount > 0 && rawTitle.trim().length > 0;
-
-            return {
-              id: `row_${Date.now()}_${idx}`,
-              date: new Date(rawDate).toISOString().split('T')[0],
-              title: rawTitle.toString().trim(),
-              amount: isNaN(rawAmount) ? 0 : rawAmount,
-              type,
-              categoryName: rawCat.toString().trim(),
-              paymentMethodName: rawPM.toString().trim(),
-              notes: rawNotes.toString().trim() || undefined,
-              isValid
-            };
-          });
+          const extractedRows: EditableImportRow[] = parseCsvTransactions(String(evt.target?.result || ''), {
+            expenseCategory: categories.find(category => category.type === 'EXPENSE')?.name || 'General',
+            incomeCategory: categories.find(category => category.type === 'INCOME')?.name || 'Income',
+            paymentMethod: paymentMethods[0]?.name || 'Cash'
+          }).map((row, index) => ({ ...row, id: `row_${Date.now()}_${index}` }));
 
           setRows(extractedRows);
-        } catch (err) {
-          console.error('Error parsing file:', err);
+          setStatusBanner(null);
+        } catch (error) {
+          setRows([]);
+          setStatusBanner({ type: 'error', text: error instanceof Error ? error.message : 'Unable to parse this CSV file.' });
         }
       };
-      reader.readAsArrayBuffer(file);
+      reader.readAsText(file);
     } else {
-      setStatusBanner({ type: 'error', text: 'Unsupported file type. Please upload an Excel (.xlsx, .xls) or CSV (.csv) file.' });
+      setStatusBanner({ type: 'error', text: 'Unsupported file type. Please upload a CSV (.csv) file.' });
     }
   };
 
@@ -152,7 +135,7 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <FileSpreadsheet size={20} style={{ color: '#10B981' }} /> Add Bulk (Excel / CSV)
+        <FileSpreadsheet size={20} style={{ color: '#10B981' }} /> Add Bulk (CSV)
       </h3>
 
       {statusBanner && (
@@ -182,8 +165,8 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 8 }}>
         <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 12, padding: 10, textAlign: 'center' }}>
           <FileSpreadsheet size={20} style={{ color: '#10B981', margin: '0 auto 4px auto' }} />
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#FFF' }}>Excel / CSV</div>
-          <div style={{ fontSize: 9, color: '#94A3B8' }}>.xlsx, .xls, .csv</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#FFF' }}>CSV</div>
+          <div style={{ fontSize: 9, color: '#94A3B8' }}>Up to 1,000 rows / 1 MB</div>
         </div>
       </div>
 
@@ -223,12 +206,12 @@ export const BulkImportView: React.FC<BulkImportViewProps> = ({
         }}>
           <Upload size={24} style={{ color: '#10B981' }} />
           <div style={{ fontSize: 13, fontWeight: 600, color: '#FFF' }}>
-            {fileName ? fileName : 'Upload an Excel (.xlsx, .xls) or CSV (.csv) file'}
+            {fileName ? fileName : 'Upload a CSV (.csv) file'}
           </div>
           <div style={{ fontSize: 10, color: '#94A3B8' }}>Preview and edit transactions before saving them</div>
           <input
             type="file"
-            accept=".xlsx, .xls, .csv"
+            accept=".csv,text/csv"
             onChange={handleFileUpload}
             style={{ display: 'none' }}
           />
