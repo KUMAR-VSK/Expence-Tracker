@@ -2,9 +2,11 @@ package com.example.expensetracker
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.webkit.ConsoleMessage
+import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
@@ -21,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.annotation.RequiresApi
 import androidx.webkit.WebViewAssetLoader
 import com.example.expensetracker.theme.ExpenseTrackerTheme
 
@@ -47,7 +50,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+        WebView.setWebContentsDebuggingEnabled(true)
 
         enableEdgeToEdge()
         setContent {
@@ -93,6 +96,25 @@ class MainActivity : ComponentActivity() {
                                         failingUrl: String?
                                     ) {
                                         Log.e("WebViewError", "Error $errorCode: $description on $failingUrl")
+                                    }
+
+                                    @Suppress("DEPRECATION")
+                                    override fun onReceivedSslError(
+                                        view: WebView?,
+                                        handler: SslErrorHandler?,
+                                        error: android.net.http.SslError?
+                                    ) {
+                                        Log.e("WebViewSslError", "SSL Error: ${error?.primaryError} - ${error?.url}")
+                                        handler?.proceed()
+                                    }
+
+                                    @RequiresApi(Build.VERSION_CODES.M)
+                                    override fun onReceivedHttpError(
+                                        view: WebView?,
+                                        request: WebResourceRequest?,
+                                        errorResponse: android.webkit.WebResourceResponse?
+                                    ) {
+                                        Log.e("WebViewHttpError", "HTTP Error ${errorResponse?.statusCode} on ${request?.url}")
                                     }
                                 }
 
