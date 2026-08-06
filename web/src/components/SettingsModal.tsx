@@ -2,30 +2,69 @@ import React, { useState } from 'react';
 import { X, Coins, Lock, Unlock, Download, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
 import type { AppSettings, Expense, Category, PaymentMethod, Budget, Subscription } from '../types';
 
+interface BackupData {
+  expenses: Expense[];
+  categories: Category[];
+  paymentMethods: PaymentMethod[];
+  budgets: Budget[];
+  subscriptions: Subscription[];
+  settings: AppSettings;
+}
+
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: AppSettings;
   onUpdateSettings: (patch: Partial<AppSettings>) => void;
-  backupData: {
-    expenses: Expense[];
-    categories: Category[];
-    paymentMethods: PaymentMethod[];
-    budgets: Budget[];
-    subscriptions: Subscription[];
-    settings: AppSettings;
-  };
-  onImport: (data: {
-    expenses: Expense[];
-    categories: Category[];
-    paymentMethods: PaymentMethod[];
-    budgets: Budget[];
-    subscriptions: Subscription[];
-    settings: AppSettings;
-  }) => void;
+  backupData: BackupData;
+  onImport: (data: BackupData) => void;
 }
 
 const CURRENCIES = ['₹', '$', '€', '£'] as const;
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+const isString = (value: unknown): value is string => typeof value === 'string';
+const isNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+const hasStrings = (value: Record<string, unknown>, fields: string[]) => fields.every(field => isString(value[field]));
+const isTransactionType = (value: unknown) => value === 'EXPENSE' || value === 'INCOME';
+
+const isExpense = (value: unknown): value is Expense => isRecord(value)
+  && hasStrings(value, ['id', 'title', 'categoryId', 'categoryName', 'categoryIcon', 'categoryColor', 'paymentMethodId', 'paymentMethodName', 'date'])
+  && isNumber(value.amount)
+  && isTransactionType(value.type);
+
+const isCategory = (value: unknown): value is Category => isRecord(value)
+  && hasStrings(value, ['id', 'name', 'icon', 'color'])
+  && isTransactionType(value.type);
+
+const isPaymentMethod = (value: unknown): value is PaymentMethod => isRecord(value)
+  && hasStrings(value, ['id', 'name', 'icon'])
+  && (value.type === 'CARD' || value.type === 'CASH' || value.type === 'UPI' || value.type === 'BANK');
+
+const isBudget = (value: unknown): value is Budget => isRecord(value)
+  && hasStrings(value, ['id', 'categoryId', 'categoryName', 'categoryIcon', 'categoryColor', 'monthYear'])
+  && isNumber(value.limitAmount)
+  && isNumber(value.spentAmount);
+
+const isSubscription = (value: unknown): value is Subscription => isRecord(value)
+  && hasStrings(value, ['id', 'name', 'categoryName', 'billingCycle', 'dueDate', 'icon'])
+  && isNumber(value.amount)
+  && (value.billingCycle === 'Monthly' || value.billingCycle === 'Yearly')
+  && typeof value.active === 'boolean';
+
+const isAppSettings = (value: unknown): value is AppSettings => isRecord(value)
+  && isString(value.currency)
+  && typeof value.darkMode === 'boolean'
+  && typeof value.isPinLocked === 'boolean'
+  && isString(value.pin)
+  && (value.viewMode === 'PHONE_FRAME' || value.viewMode === 'MINI_PLAYER' || value.viewMode === 'FULL_SCREEN');
+
+const isBackupData = (value: unknown): value is BackupData => isRecord(value)
+  && Array.isArray(value.expenses) && value.expenses.every(isExpense)
+  && Array.isArray(value.categories) && value.categories.some(category => category.type === 'EXPENSE') && value.categories.some(category => category.type === 'INCOME') && value.categories.every(isCategory)
+  && Array.isArray(value.paymentMethods) && value.paymentMethods.length > 0 && value.paymentMethods.every(isPaymentMethod)
+  && Array.isArray(value.budgets) && value.budgets.every(isBudget)
+  && Array.isArray(value.subscriptions) && value.subscriptions.every(isSubscription)
+  && isAppSettings(value.settings);
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
@@ -62,13 +101,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       try {
         const content = evt.target?.result as string;
         const parsed = JSON.parse(content);
-        // Basic shape validation
-        if (!parsed.expenses || !parsed.categories || !parsed.paymentMethods || !parsed.budgets || !parsed.subscriptions || !parsed.settings) {
+        if (!isBackupData(parsed)) {
           throw new Error('Invalid backup format');
         }
         onImport(parsed);
         setImportStatus({ type: 'success', message: 'Import successful! Data restored.' });
-      } catch (err) {
+      } catch {
         setImportStatus({ type: 'error', message: 'Failed to import: invalid or corrupted file' });
       }
     };

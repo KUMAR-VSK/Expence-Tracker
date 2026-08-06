@@ -109,6 +109,7 @@ export function App() {
     setBudgets(data.budgets);
     setSubscriptions(data.subscriptions);
     setSettings(data.settings);
+    setIsUnlocked(!data.settings.isPinLocked);
   };
 
   useEffect(() => {
